@@ -1,0 +1,76 @@
+/* --- Search View (Spotify Style) --- */
+#search_container {
+    padding: 2 4;
+    background: #000000;
+}
+
+#search_type_selector {
+    height: 1;
+    margin-bottom: 1;
+    border: none;
+    background: transparent;
+    layout: horizontal;
+    align: left middle;
+}
+
+#search_type_selector Button {
+    background: #282828;
+    color: #1DB954; /* $accent */
+    margin-right: 2;
+    padding: 0 1;
+    border: none;
+    height: 1;
+    min-width: 6;
+}
+
+#search_type_selector Button.-active {
+    background: #FFFFFF;
+    color: #000000;
+    text-style: bold;
+}
+
+#search_type_selector Button:hover {
+    background: #3E3E3E;
+    color: #FFFFFF;
+}
+
+#search_input {
+    background: #242424;
+    border: none;
+    color: #1DB954; /* $accent */
+    margin-bottom: 2;
+}
+
+#search_input:focus {
+    border: solid #1DB954; /* $accent */
+    background: #2A2A2A;
+}
+
+#loading_indicator {
+    color: #1DB954; /* $accent */
+    margin-bottom: 1;
+    text-align: center;
+}
+
+#search_results {
+    height: 1fr;
+    scrollbar-gutter: stable;
+}
+
+MediaItem {
+    padding: 1 2;
+    margin: 0 0;
+    height: auto;
+}
+
+MediaItem:hover {
+    background: #282828;
+}
+
+MediaItem Label {
+    color: #1DB954; /* $accent */
+}
+
+MediaItem:hover Label {
+    color: #FFFFFF;
+}

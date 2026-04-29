@@ -1,0 +1,88 @@
+/* --- Queue Drawer (Spotify Style) --- */
+QueueDrawer {
+    width: 45;
+    height: 100%;
+    background: #121212; /* Spotify Panel BG */
+    border-left: solid #282828;
+    padding: 1 2;
+    dock: right;
+}
+
+QueueDrawer.-hidden {
+    display: none;
+}
+
+#queue_title {
+    width: 100%;
+    color: #1DB954; /* $accent */
+    text-style: bold;
+    margin: 1 0 1 0;
+    content-align: center middle;
+}
+
+#queue_controls {
+    height: 3;
+    width: 100%;
+    align: center middle;
+    margin-bottom: 1;
+}
+
+#queue_controls Button {
+    width: auto;
+    min-width: 14;
+    height: 3;
+    margin: 0 2;
+    padding: 0 2;
+    background: #282828;
+    color: #1DB954; /* $accent */
+    border: none;
+    text-style: bold;
+}
+
+#queue_controls Button:hover {
+    background: #3E3E3E;
+    color: #FFFFFF;
+}
+
+.queue-separator {
+    height: 1;
+    width: 100%;
+    border-bottom: solid #282828;
+    margin-bottom: 1;
+}
+
+#queue_loading {
+    color: #1DB954; /* $accent */
+    margin-bottom: 1;
+}
+
+#queue_list {
+    height: 1fr;
+    width: 100%;
+    scrollbar-gutter: stable;
+}
+
+QueueItem {
+    padding: 1 2;
+    margin: 0 0;
+    height: auto;
+    width: 100%;
+}
+
+QueueItem:hover {
+    background: #282828;
+}
+
+QueueItem Label {
+    color: #1DB954; /* $accent */
+    width: 100%;
+}
+
+QueueItem:hover Label {
+    color: #FFFFFF;
+}
+
+QueueItem.current-track Label {
+    color: #FFFFFF;
+    text-style: bold;
+}

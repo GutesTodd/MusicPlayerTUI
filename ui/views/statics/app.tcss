@@ -1,0 +1,188 @@
+/* --- Дизайн-система (Spotify Aesthetic) --- */
+$accent: #1DB954;
+$panel_bg: #121212;
+$surface: #181818;
+$background: #000000;
+$text: #FFFFFF;
+$text-muted: #A7A7A7;
+
+Screen {
+    background: $background;
+    layers: default logs;
+}
+
+/* --- Layout Architecture --- */
+#sidebar {
+    dock: left;
+    width: 32;
+    height: 100%;
+    background: $background;
+    padding: 2 2;
+    border-right: solid #282828;
+}
+
+#player_bar {
+    dock: bottom;
+    height: 11;
+    background: $surface;
+    border-top: solid #282828;
+    padding: 0 4;
+}
+
+#log_panel {
+    dock: bottom;
+    height: 15;
+    background: $panel_bg;
+    border-top: tall $accent;
+    display: none;
+    layer: logs;
+}
+
+#log_panel.-visible {
+    display: block;
+}
+
+#main_container {
+    width: 1fr;
+    height: 100%;
+    background: $background;
+}
+
+#main_content {
+    width: 1fr;
+    height: 1fr;
+}
+
+/* --- Sidebar Styling --- */
+#logo {
+    color: $accent;
+    text-style: bold;
+    margin-bottom: 3;
+    padding-left: 2;
+}
+
+.section-title {
+    color: $accent;
+    text-style: bold;
+    margin: 2 0 1 2;
+}
+
+.separator {
+    height: 1;
+    border-bottom: solid #282828;
+    margin: 1 2;
+}
+
+.nav-menu Button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    text-align: left;
+    color: $accent;
+    padding-left: 2;
+    margin-bottom: 0;
+    height: 3;
+    transition: background 150ms;
+}
+
+.nav-menu Button:hover {
+    color: $text;
+    background: #282828;
+    text-style: bold;
+}
+
+.nav-menu Button.-active {
+    color: $text;
+    background: #282828;
+    text-style: bold;
+}
+
+/* --- Player Bar Styling --- */
+#player_layout {
+    height: 100%;
+    width: 100%;
+    layout: vertical;
+    align: center middle;
+}
+
+#player_row1 {
+    height: 1;
+    width: 100%;
+    margin-bottom: 1;
+}
+
+#current_track {
+    width: 1fr;
+    color: $accent;
+    text-style: bold;
+    text-align: left; /* Явное выравнивание влево */
+}
+
+#track_progress {
+    width: 4fr; /* Увеличили долю, чтобы полоска была шире и симметричнее */
+    margin: 0 2;
+}
+
+#time_code {
+    width: 1fr;
+    color: $accent;
+    text-align: right; /* Явное выравнивание вправо */
+}
+
+#player_row2 {
+    height: 3;
+    width: 100%;
+    align: center middle;
+    margin-bottom: 1;
+}
+
+#wave_viz {
+    width: 100%;
+    content-align: center middle;
+}
+
+#player_row3 {
+    height: 3;
+    width: 100%;
+    align: center middle;
+}
+
+#player_row3_left {
+    width: 30%;
+}
+
+#player_controls {
+    width: 40%;
+    align: center middle;
+}
+
+#volume_group {
+    width: 30%;
+    align: right middle;
+}
+
+#volume_bar {
+    width: 15;
+    margin-left: 2;
+}
+
+#track_progress > .progress--bar {
+    color: $accent;
+    background: #404040;
+}
+
+#player_controls Button {
+    min-width: 10;
+    background: transparent;
+    border: none;
+    color: $accent;
+}
+
+#player_controls Button:hover {
+    color: $text;
+}
+
+#volume_bar > .progress--bar {
+    color: $accent;
+    background: #404040;
+}

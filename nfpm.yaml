@@ -1,0 +1,31 @@
+name: "yandex-music-cli"
+arch: "amd64"
+platform: "linux"
+version: "${VERSION}"
+section: "default"
+priority: "extra"
+maintainer: "Your Name <your@email.com>"
+description: "Yandex Music CLI client with Textual UI and Clean Architecture."
+vendor: "YandexMusicCLI"
+homepage: "https://github.com/youruser/yandex-music-cli"
+license: "MIT"
+
+contents:
+  - src: "./scripts/run.sh"
+    dst: "/usr/bin/yandex-music-cli"
+  - src: "launcher.py"
+    dst: "/usr/share/yandex-music-cli/launcher.py"
+  - src: "backend/"
+    dst: "/usr/share/yandex-music-cli/backend/"
+  - src: "ui/"
+    dst: "/usr/share/yandex-music-cli/ui/"
+  - src: "shared/"
+    dst: "/usr/share/yandex-music-cli/shared/"
+
+overrides:
+  deb:
+    depends:
+      - mpv
+  rpm:
+    depends:
+      - mpv
