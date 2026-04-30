@@ -16,11 +16,11 @@ contents:
   - src: "launcher.py"
     dst: "/usr/share/yandex-music-cli/launcher.py"
   - src: "backend/"
-    dst: "/usr/share/yandex-music-cli/backend/"
+    dst: "/usr/share/yandex-music-cli/backend"
   - src: "ui/"
-    dst: "/usr/share/yandex-music-cli/ui/"
+    dst: "/usr/share/yandex-music-cli/ui"
   - src: "shared/"
-    dst: "/usr/share/yandex-music-cli/shared/"
+    dst: "/usr/share/yandex-music-cli/shared"
 
 overrides:
   deb:
