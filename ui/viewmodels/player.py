@@ -82,3 +82,12 @@ class PlayerViewModel(BaseViewModel):
         if response.get("status") == "ok":
             self.volume = safe_volume
             self.notify()
+
+    async def seek(self, position_ms: int) -> None:
+        logger.info(f"Запрос на перемотку: {position_ms}ms")
+        response = await self._client.send_command(
+            "playback.seek", {"position_ms": position_ms}
+        )
+        if response and response.get("status") == "ok":
+            self.position_ms = position_ms
+            self.notify()
