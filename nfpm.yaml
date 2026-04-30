@@ -1,4 +1,4 @@
-name: "music-player-tui"
+name: "music-player-cli"
 arch: "amd64"
 platform: "linux"
 version: "${VERSION}"

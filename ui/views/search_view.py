@@ -11,13 +11,18 @@ from ui.viewmodels.search import SearchViewModel
 class MediaItem(Static):
     class Selected(Message):
         def __init__(
-            self, media_id: str, media_type: str, title: str, artist: str
+            self, item: MediaItem, media_id: str, media_type: str, title: str, artist: str
         ) -> None:
+            self.item = item
             self.media_id = media_id
             self.media_type = media_type
             self.title = title
             self.artist = artist
             super().__init__()
+
+        @property
+        def control(self) -> MediaItem:
+            return self.item
 
     def __init__(
         self, media_id: str, media_type: str, title: str, artist: str, **kwargs
@@ -45,7 +50,7 @@ class MediaItem(Static):
 
     def on_click(self) -> None:
         self.post_message(
-            self.Selected(self.media_id, self.media_type, self.title, self.artist)
+            self.Selected(self, self.media_id, self.media_type, self.title, self.artist)
         )
 
 

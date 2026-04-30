@@ -21,14 +21,24 @@ class InteractiveSlider(Widget, can_focus=True):
     """
 
     class Changed(Message):
-        def __init__(self, value: float) -> None:
+        def __init__(self, slider: InteractiveSlider, value: float) -> None:
             super().__init__()
+            self.slider = slider
             self.value = value
 
+        @property
+        def control(self) -> InteractiveSlider:
+            return self.slider
+
     class Seeked(Message):
-        def __init__(self, value: float) -> None:
+        def __init__(self, slider: InteractiveSlider, value: float) -> None:
             super().__init__()
+            self.slider = slider
             self.value = value
+
+        @property
+        def control(self) -> InteractiveSlider:
+            return self.slider
 
     value: reactive[float] = reactive(0.0)
     _dragging: bool = False
@@ -42,11 +52,11 @@ class InteractiveSlider(Widget, can_focus=True):
 
         text = Text()
         # Filled part
-        text.append("━" * max(0, filled_width - 1), style="$accent")
+        text.append("━" * max(0, filled_width - 1), style="#1DB954")
         # Thumb
-        text.append("●", style="white" if not self._dragging else "$accent")
+        text.append("●", style="white" if not self._dragging else "#1DB954")
         # Unfilled part
-        text.append("━" * max(0, width - filled_width), style="$text-muted")
+        text.append("━" * max(0, width - filled_width), style="#A7A7A7")
 
         return text
 
@@ -54,7 +64,7 @@ class InteractiveSlider(Widget, can_focus=True):
         width = self.size.width
         if width > 0:
             self.value = max(0.0, min(1.0, x / width))
-            self.post_message(self.Changed(self.value))
+            self.post_message(self.Changed(self, self.value))
 
     def on_mouse_down(self, event: MouseDown) -> None:
         self._dragging = True
@@ -71,4 +81,4 @@ class InteractiveSlider(Widget, can_focus=True):
             self._dragging = False
             self.remove_class("-dragging")
             self.release_mouse()
-            self.post_message(self.Seeked(self.value))
+            self.post_message(self.Seeked(self, self.value))
