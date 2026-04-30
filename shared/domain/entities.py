@@ -1,5 +1,16 @@
+from __future__ import annotations
+
+from enum import StrEnum
+
 from pydantic import Field
+
 from shared.domain.common import BaseEntity
+
+
+class RepeatMode(StrEnum):
+    NONE = "none"
+    ONE = "one"
+    ALL = "all"
 
 
 class Artist(BaseEntity):
