@@ -63,10 +63,10 @@ jobs:
 
       - name: Copy Project Source
         run: |
-          xcopy /E /I backend dist/portable/backend
-          xcopy /E /I ui dist/portable/ui
-          xcopy /E /I shared dist/portable/shared
-          copy launcher.py dist/portable/launcher.py
+          Copy-Item -Path "backend" -Destination "dist/portable/backend" -Recurse -Force
+          Copy-Item -Path "ui" -Destination "dist/portable/ui" -Recurse -Force
+          Copy-Item -Path "shared" -Destination "dist/portable/shared" -Recurse -Force
+          Copy-Item -Path "launcher.py" -Destination "dist/portable/launcher.py" -Force
 
       - name: Create Launcher (BAT)
         run: |

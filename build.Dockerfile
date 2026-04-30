@@ -1,12 +1,13 @@
-FROM ubuntu:22.04
+FROM alpine:latest
 
 # Установка системных зависимостей
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     curl \
-    python3.12 \
-    python3-pip \
+    python3 \
+    py3-pip \
     git \
-    && rm -rf /var/lib/apt/lists/*
+    bash \
+    tar
 
 # Установка uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvbin/uv
