@@ -58,17 +58,12 @@ class TickerLabel(Label):
 class PlayerBar(Static):
     def compose(self) -> ComposeResult:
         with Vertical(id="player_layout"):
-            # Уровень 1: Название - Прогресс - Таймкод
             with Horizontal(id="player_row1"):
                 yield TickerLabel("▶ Сейчас ничего не играет", id="current_track")
                 yield InteractiveSlider(id="track_progress")
                 yield Label("00:00 / 00:00", id="time_code")
-
-            # Уровень 2: Визуализатор
             with Horizontal(id="player_row2"):
                 yield Visualizer(id="wave_viz")
-
-            # Уровень 3: Кнопки - Громкость
             with Horizontal(id="player_row3"):
                 with Horizontal(id="player_row3_left"):
                     pass
@@ -90,7 +85,9 @@ class PlayerBar(Static):
     @on(InteractiveSlider.Changed, "#track_progress")
     def on_track_progress_dragging(self, event: InteractiveSlider.Changed) -> None:
         # Just update UI time code while dragging
-        self.app.player_vm.position_ms = int(event.value * self.app.player_vm.duration_ms)
+        self.app.player_vm.position_ms = int(
+            event.value * self.app.player_vm.duration_ms
+        )
         self.app._on_player_update()
 
     @on(InteractiveSlider.Seeked, "#track_progress")
