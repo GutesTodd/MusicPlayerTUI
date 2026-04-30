@@ -216,6 +216,8 @@ __marimo__/
 
 # Gemini
 .agents/
+docs/O
+
 
 # Streamlit
 .streamlit/secrets.toml
