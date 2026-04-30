@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from typing import Any
 
+from textual import on
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
-from textual.widgets import Button, Label, ProgressBar, Static
+from textual.widgets import Button, Label, Static
 
+from ui.widgets.slider import InteractiveSlider
 from ui.widgets.visualizer import Visualizer
 
 
@@ -59,13 +61,7 @@ class PlayerBar(Static):
             # Уровень 1: Название - Прогресс - Таймкод
             with Horizontal(id="player_row1"):
                 yield TickerLabel("▶ Сейчас ничего не играет", id="current_track")
-                yield ProgressBar(
-                    total=100,
-                    show_bar=True,
-                    show_percentage=False,
-                    show_eta=False,
-                    id="track_progress",
-                )
+                yield InteractiveSlider(id="track_progress")
                 yield Label("00:00 / 00:00", id="time_code")
 
             # Уровень 2: Визуализатор
@@ -83,10 +79,21 @@ class PlayerBar(Static):
                     yield Button("󰒭", id="btn_next")
                 with Horizontal(id="volume_group"):
                     yield Label("󰕾 ")
-                    yield ProgressBar(
-                        total=100,
-                        show_bar=True,
-                        show_percentage=False,
-                        show_eta=False,
-                        id="volume_bar",
-                    )
+                    yield InteractiveSlider(id="volume_bar")
+
+    @on(InteractiveSlider.Changed, "#volume_bar")
+    def on_volume_change(self, event: InteractiveSlider.Changed) -> None:
+        # Update volume in real-time
+        self.app.player_vm.volume = int(event.value * 100)
+        self.run_worker(self.app.player_vm.set_volume(self.app.player_vm.volume))
+
+    @on(InteractiveSlider.Changed, "#track_progress")
+    def on_track_progress_dragging(self, event: InteractiveSlider.Changed) -> None:
+        # Just update UI time code while dragging
+        self.app.player_vm.position_ms = int(event.value * self.app.player_vm.duration_ms)
+        self.app._on_player_update()
+
+    @on(InteractiveSlider.Seeked, "#track_progress")
+    def on_track_seek(self, event: InteractiveSlider.Seeked) -> None:
+        target_ms = int(event.value * self.app.player_vm.duration_ms)
+        self.run_worker(self.app.player_vm.seek(target_ms))
