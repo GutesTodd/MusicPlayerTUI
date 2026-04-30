@@ -7,7 +7,11 @@ RUN apk add --no-cache \
     py3-pip \
     git \
     bash \
-    tar
+    tar \
+    linux-headers \
+    musl-dev \
+    gcc \
+    python3-dev
 
 # Установка uv
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvbin/uv

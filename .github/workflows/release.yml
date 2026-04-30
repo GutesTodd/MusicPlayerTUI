@@ -70,10 +70,12 @@ jobs:
 
       - name: Create Launcher (BAT)
         run: |
-          "@echo off
+          $content = @"
+          @echo off
           cd /d %~dp0
           python.exe launcher.py
-          "@ | Out-File -FilePath dist/portable/start.bat -Encoding ascii
+          "@
+          $content | Set-Content -Path "dist/portable/start.bat" -Encoding Ascii
 
       - name: Create Zip Archive
         run: |
