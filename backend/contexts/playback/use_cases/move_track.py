@@ -1,5 +1,6 @@
 from loguru import logger
-from shared.domain.interfaces import QueueManager, PlaybackController, TrackStreamer
+
+from shared.domain.interfaces import PlaybackController, QueueManager, TrackStreamer
 
 
 class MoveTrackUseCase:
@@ -15,7 +16,7 @@ class MoveTrackUseCase:
 
     async def execute(self, direction: str) -> None:
         logger.info(f"Переключение трека: {direction}")
-        
+
         if direction == "next":
             track = await self.queue_manager.next_track()
         else:

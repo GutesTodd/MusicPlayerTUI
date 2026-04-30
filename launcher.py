@@ -15,7 +15,7 @@ backend_proc = None
 
 def cleanup():
     """Гарантированная остановка бэкенда при выходе."""
-    global backend_proc
+    global backend_proc  # noqa: PLW0602
     if backend_proc and backend_proc.poll() is None:
         logger.info("Завершение процесса бэкенда...")
         backend_proc.terminate()
@@ -61,7 +61,7 @@ def start_backend():
 
 
 def main():
-    global backend_proc
+    global backend_proc  # noqa: PLW0603
 
     # 1. Проверяем, не запущен ли уже бэкенд
     if not is_port_open("127.0.0.1", 8888):

@@ -1,166 +1,36 @@
 from __future__ import annotations
 
-import math
-import random
-from typing import Final, Any
+from typing import Any, ClassVar, Final
 
 from textual import on
 from textual.app import App, ComposeResult
-from textual.containers import Horizontal, Vertical, Container
-from textual.widgets import Header, Footer, Static, Button, Label, ProgressBar
 from textual.binding import Binding
+from textual.containers import Container, Horizontal
+from textual.widgets import Button, Footer, Header, Label, ProgressBar
 
-from ui.utils.socket_client import SocketClient
-from ui.viewmodels.search import SearchViewModel
-from ui.viewmodels.player import PlayerViewModel
-from ui.viewmodels.auth import AuthViewModel
-from ui.viewmodels.queue import QueueViewModel
-from ui.views.auth_screen import AuthScreen
-from ui.views.search_view import SearchView
-from ui.views.log_view import LogPanel
-from ui.widgets.queue_drawer import QueueDrawer
 from ui.infrastructure.hotkeys import PynputHotkeyProvider
-
-
-class Visualizer(Static):
-    def on_mount(self) -> None:
-        self.width_cells: int = 30
-        self.points: list[float] = [0.0] * self.width_cells
-        self.phase: float = 0.0
-        self.set_interval(0.05, self._update_wave)
-
-    def _update_wave(self) -> None:
-        app = self.app
-        if not isinstance(app, MusicPlayerApp):
-            return
-
-        if app.player_vm.is_playing:
-            self.phase += 0.5
-            self.points = [
-                (math.sin(self.phase + i * 0.5) * 2 + random.uniform(-1, 1))
-                for i in range(self.width_cells)
-            ]
-            self.update(self._render_wave())
-        else:
-            self.points = [p * 0.8 for p in self.points]
-            self.update(self._render_wave())
-
-    def _render_wave(self) -> str:
-        glyphs: Final = " ▂▃▄▅▆▇█"
-        res = ""
-        for p in self.points:
-            idx = int(abs(p) * 2) % len(glyphs)
-            color = "$accent" if abs(p) < 1.5 else "white"
-            res += f"[{color}]{glyphs[idx]}[/]"
-        return res
-
-
-class Sidebar(Static):
-    def compose(self) -> ComposeResult:
-        yield Label("󰎈 YANDEX MUSIC", id="logo")
-        with Vertical(classes="nav-menu"):
-            yield Button(
-                "󰄉  Поиск", id="btn_search", variant="default", classes="-active"
-            )
-            yield Button("󰓇  Моя волна", id="btn_wave", variant="default")
-            yield Button("󰒍  Очередь", id="btn_toggle_queue")
-            yield Static(classes="separator")
-            yield Label("МЕДИАТЕКА", classes="section-title")
-            yield Button("󰓦  Плейлисты", id="btn_playlists")
-            yield Button("󰓀  Альбомы", id="btn_albums")
-
-
-class TickerLabel(Label):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
-        self._full_text: str = ""
-        self._offset: int = 0
-        self._ticker_interval: Any = None
-
-    def update_text(self, text: str) -> None:
-        if self._full_text == text:
-            return
-        self._full_text = text
-        self._offset = 0
-        if self._ticker_interval is None:
-            self._ticker_interval = self.set_interval(0.3, self._tick)
-        self._render_text()
-
-    def _tick(self) -> None:
-        width = self.size.width
-        if not self._full_text or width <= 0:
-            return
-
-        if len(self._full_text) > width:
-            self._offset = (self._offset + 1) % (len(self._full_text) + 5)
-            self._render_text()
-        else:
-            if self._offset != 0:
-                self._offset = 0
-                self._render_text()
-
-    def _render_text(self) -> None:
-        width = self.size.width
-        if not self._full_text:
-            self.update("")
-            return
-
-        if width <= 0 or len(self._full_text) <= width:
-            self.update(self._full_text)
-            return
-
-        padded = self._full_text + "     " + self._full_text
-        visible = padded[self._offset : self._offset + width]
-        self.update(visible)
-
-
-class PlayerBar(Static):
-    def compose(self) -> ComposeResult:
-        with Vertical(id="player_layout"):
-            # Уровень 1: Название - Прогресс - Таймкод
-            with Horizontal(id="player_row1"):
-                yield TickerLabel("▶ Сейчас ничего не играет", id="current_track")
-                yield ProgressBar(
-                    total=100,
-                    show_bar=True,
-                    show_percentage=False,
-                    show_eta=False,
-                    id="track_progress",
-                )
-                yield Label("00:00 / 00:00", id="time_code")
-
-            # Уровень 2: Визуализатор
-            with Horizontal(id="player_row2"):
-                yield Visualizer(id="wave_viz")
-
-            # Уровень 3: Кнопки - Громкость
-            with Horizontal(id="player_row3"):
-                with Horizontal(id="player_row3_left"):
-                    pass
-                with Horizontal(id="player_controls"):
-                    yield Button("󰒮", id="btn_prev")
-                    yield Button("󰐊", id="btn_play_pause")
-                    yield Button("󰒭", id="btn_next")
-                with Horizontal(id="volume_group"):
-                    yield Label("󰕾 ")
-                    yield ProgressBar(
-                        total=100,
-                        show_bar=True,
-                        show_percentage=False,
-                        show_eta=False,
-                        id="volume_bar",
-                    )
+from ui.utils.socket_client import SocketClient
+from ui.viewmodels.auth import AuthViewModel
+from ui.viewmodels.player import PlayerViewModel
+from ui.viewmodels.queue import QueueViewModel
+from ui.viewmodels.search import SearchViewModel
+from ui.views.auth_screen import AuthScreen
+from ui.views.log_view import LogPanel
+from ui.views.search_view import SearchView
+from ui.widgets.player_bar import PlayerBar, TickerLabel
+from ui.widgets.queue_drawer import QueueDrawer
+from ui.widgets.sidebar import Sidebar
 
 
 class MusicPlayerApp(App[None]):
-    CSS_PATH = [
+    CSS_PATH: ClassVar[list[str]] = [
         "views/statics/app.tcss",
         "views/statics/queue_drawer.tcss",
         "views/statics/search_view.tcss",
         "views/statics/log_panel.tcss",
     ]
 
-    BINDINGS = [
+    BINDINGS: ClassVar[list[Binding]] = [
         Binding("q", "quit", "Выход", show=True),
         Binding("ctrl+l", "toggle_logs", "Логи", show=True),
         Binding("ctrl+q", "toggle_queue", "Очередь", show=True),
@@ -198,14 +68,14 @@ class MusicPlayerApp(App[None]):
         if not self.auth_vm.is_authenticated("yandex"):
             self.push_screen(AuthScreen(self.auth_vm))
 
-        self._hotkey_provider.start(lambda action: self._on_hotkey(action))
+        self._hotkey_provider.start(self._on_hotkey)
         self.set_interval(1.0, self._tick_timer)
 
     def _on_hotkey(self, action: str) -> None:
         self.call_from_thread(self.run_action, action)
 
     def action_toggle_play(self) -> None:
-        """Переключение воспроизведения через Worker (Thread-safe)."""
+        """Toggle playback via Worker (Thread-safe)."""
         self.run_worker(self.player_vm.toggle_pause())
 
     def action_next_track(self) -> None:
@@ -224,7 +94,7 @@ class MusicPlayerApp(App[None]):
             self.run_worker(self.queue_vm.load_queue())
 
     def _tick_timer(self) -> None:
-        """Мнимый таймер для обновления прогресса."""
+        """Timer for updating progress."""
         if self.player_vm.is_playing:
             self.player_vm.position_ms += 1000
             if self.player_vm.position_ms > self.player_vm.duration_ms:
@@ -238,7 +108,7 @@ class MusicPlayerApp(App[None]):
         return f"{minutes:02d}:{seconds:02d}"
 
     def _on_player_update(self) -> None:
-        """Реакция на изменения в PlayerViewModel."""
+        """React to PlayerViewModel changes."""
         try:
             if self.player_vm.current_track:
                 self.query_one("#current_track", TickerLabel).update_text(
@@ -247,13 +117,22 @@ class MusicPlayerApp(App[None]):
                 btn_play = self.query_one("#btn_play_pause", Button)
                 btn_play.label = "󰏤" if self.player_vm.is_playing else "󰐊"
 
-            # Обновление времени и прогресс-бара
+            # Update time and progress bar
             pos_str = self._format_time(self.player_vm.position_ms)
             dur_str = self._format_time(self.player_vm.duration_ms)
             self.query_one("#time_code", Label).update(f"{pos_str} / {dur_str}")
 
             vol_bar = self.query_one("#volume_bar", ProgressBar)
             vol_bar.progress = float(self.player_vm.volume)
+
+            # Update repeat mode
+            btn_repeat = self.query_one("#btn_repeat", Button)
+            repeat_icons = {"none": "󰑗", "all": "󰑖", "one": "󰑘"}
+            btn_repeat.label = repeat_icons.get(self.player_vm.repeat_mode, "󰑗")
+            if self.player_vm.repeat_mode != "none":
+                btn_repeat.add_class("-active")
+            else:
+                btn_repeat.remove_class("-active")
 
             track_progress = self.query_one("#track_progress", ProgressBar)
             if self.player_vm.duration_ms > 0:
@@ -262,6 +141,10 @@ class MusicPlayerApp(App[None]):
                 ) * 100
         except Exception:
             pass
+
+    @on(Button.Pressed, "#btn_repeat")
+    def handle_repeat(self) -> None:
+        self.run_worker(self.player_vm.toggle_repeat())
 
     @on(Button.Pressed, "#btn_play_pause")
     def handle_play_pause(self) -> None:

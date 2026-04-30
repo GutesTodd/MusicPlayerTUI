@@ -1,19 +1,22 @@
 from dishka import FromDishka
-from shared.infrastructure.socket.app import SocketRouter
+
 from shared.domain.commands import (
-    PlayMediaCommand,
-    PlaybackCommand,
-    SetVolumeCommand,
-    PauseCommand,
-    ResumeCommand,
-    NextTrackCommand,
-    PrevTrackCommand,
     GetQueueCommand,
+    ModePlayCommand,
+    NextTrackCommand,
+    PauseCommand,
+    PlaybackCommand,
+    PlayMediaCommand,
+    PrevTrackCommand,
+    ResumeCommand,
+    SetVolumeCommand,
 )
-from shared.domain.interfaces import VolumeController, PlaybackController
-from .use_cases.play_media import PlayMediaUseCase
-from .use_cases.move_track import MoveTrackUseCase
+from shared.domain.interfaces import PlaybackController, QueueManager, VolumeController
+from shared.infrastructure.socket.app import SocketRouter
+
 from .use_cases.get_queue import GetQueueUseCase
+from .use_cases.move_track import MoveTrackUseCase
+from .use_cases.play_media import PlayMediaUseCase
 
 router = SocketRouter(PlaybackCommand)
 
@@ -69,3 +72,7 @@ async def resume(
 ) -> bool:
     await controller.resume()
     return True
+
+
+@router.handler
+async def set_play_mode(cmd: ModePlayCommand, queue_manager: QueueManager): ...

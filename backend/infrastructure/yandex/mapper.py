@@ -1,7 +1,9 @@
-from yandex_music import Track as YandexTrack
-from yandex_music import Artist as YandexArtist
-from yandex_music import Album as YandexAlbum
-from yandex_music import Playlist as YandexPlaylist
+from yandex_music import (
+    Album as YandexAlbum,
+    Artist as YandexArtist,
+    Playlist as YandexPlaylist,
+    Track as YandexTrack,
+)
 
 from shared.domain import entities
 

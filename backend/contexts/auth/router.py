@@ -1,9 +1,10 @@
 from dishka import FromDishka
 from yandex_music import ClientAsync
-from shared.infrastructure.socket.app import SocketRouter
-from shared.domain.commands import GetAuthCodeCommand, GetAuthStatusCommand, AuthCommand
-from backend.contexts.auth.use_cases import YandexDeviceAuthFlow
+
 from backend.contexts.auth.domain import AuthSessionStore
+from backend.contexts.auth.use_cases import YandexDeviceAuthFlow
+from shared.domain.commands import AuthCommand, GetAuthCodeCommand, GetAuthStatusCommand
+from shared.infrastructure.socket.app import SocketRouter
 
 router = SocketRouter(AuthCommand)
 

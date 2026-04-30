@@ -1,6 +1,7 @@
 import asyncio
 import json
 from typing import Any
+
 from loguru import logger
 
 
@@ -9,7 +10,9 @@ class SocketClient:
         self._host = host
         self._port = port
 
-    async def _send(self, reader, writer, action: str, payload: dict | None) -> dict[str, Any] | None:
+    async def _send(
+        self, reader, writer, action: str, payload: dict | None
+    ) -> dict[str, Any] | None:
         if payload is None:
             payload = {}
 

@@ -1,7 +1,8 @@
-from textual.app import ComposeResult
-from textual.containers import Vertical, VerticalScroll, Horizontal
-from textual.widgets import Label, Static, Button
 from textual import on
+from textual.app import ComposeResult
+from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.widgets import Button, Label, Static
+
 from ui.viewmodels.queue import QueueViewModel
 
 
@@ -20,7 +21,9 @@ class QueueItem(Static):
             self.add_class("current-track")
 
     def on_click(self) -> None:
-        self.app.notify(f"Выбран трек: {self.artist} — {self.title}", severity="information")
+        self.app.notify(
+            f"Выбран трек: {self.artist} — {self.title}", severity="information"
+        )
 
 
 class QueueDrawer(Vertical):  # Изменили на Vertical

@@ -1,15 +1,16 @@
 from loguru import logger
+
+from shared.domain.entities import Album, Artist, Track
 from ui.utils.socket_client import SocketClient
+
 from .base import BaseViewModel
-from shared.domain.entities import Track, Album, Artist
-from typing import Union
 
 
 class SearchViewModel(BaseViewModel):
     def __init__(self, client: SocketClient):
         super().__init__()
         self._client = client
-        self.results: list[Union[Track, Album, Artist]] = []
+        self.results: list[Track | Album | Artist] = []
         self.last_query: str = ""
         self.search_type: str = "track"
 

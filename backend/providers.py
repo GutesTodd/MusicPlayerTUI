@@ -1,26 +1,27 @@
-from typing import AsyncIterable
+from collections.abc import AsyncIterable
+
 from dishka import Provider, Scope, provide
 from loguru import logger
 from yandex_music import ClientAsync
 
+from backend.contexts.auth.domain import AuthSessionStore
+from backend.contexts.auth.use_cases import YandexDeviceAuthFlow
 from backend.contexts.playback.domain.queue_manager import InMemoryQueueManager
+from backend.contexts.playback.use_cases.get_queue import GetQueueUseCase
+from backend.contexts.playback.use_cases.move_track import MoveTrackUseCase
+from backend.contexts.playback.use_cases.play_media import PlayMediaUseCase
+from backend.infrastructure.config.service import ConfigService
 from backend.infrastructure.players.mpv import MpvAudioPlayer
 from backend.infrastructure.yandex.searcher import YandexSearcher
 from backend.infrastructure.yandex.streamer import YandexStreamer
 from backend.infrastructure.yandex.track_provider import YandexTrackProvider
-from backend.infrastructure.config.service import ConfigService
-from backend.contexts.playback.use_cases.play_media import PlayMediaUseCase
-from backend.contexts.playback.use_cases.move_track import MoveTrackUseCase
-from backend.contexts.playback.use_cases.get_queue import GetQueueUseCase
-from backend.contexts.auth.domain import AuthSessionStore
-from backend.contexts.auth.use_cases import YandexDeviceAuthFlow
 from shared.domain.interfaces import (
     PlaybackController,
     PlaybackMonitor,
     QueueManager,
+    TrackProvider,
     TrackSearcher,
     TrackStreamer,
-    TrackProvider,
     VolumeController,
 )
 

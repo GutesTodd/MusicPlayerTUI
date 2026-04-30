@@ -1,11 +1,11 @@
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import Vertical, VerticalScroll, Horizontal
-from textual.widgets import Input, Label, Static, Button
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.message import Message
+from textual.widgets import Button, Input, Label, Static
 
+from shared.domain.entities import Album, Artist, Track
 from ui.viewmodels.search import SearchViewModel
-from shared.domain.entities import Track, Album, Artist
 
 
 class MediaItem(Static):

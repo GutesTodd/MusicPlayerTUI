@@ -1,10 +1,12 @@
-from typing import Literal, Protocol, Callable
+from collections.abc import Callable
+from typing import Literal, Protocol
+
+from shared.domain import entities
 
 
 class GlobalHotkeyProvider(Protocol):
     def start(self, callback: Callable[[str], None]) -> None: ...
     def stop(self) -> None: ...
-from shared.domain import entities
 
 
 class TrackSearcher(Protocol):
@@ -76,6 +78,4 @@ class QueueManager(Protocol):
 
     async def get_all(self) -> list[entities.Track] | None: ...
 
-    async def next_track(self) -> entities.Track | None: ...
-
-    async def prev_track(self) -> entities.Track | None: ...
+    async def set_repeat_mode(self, mode: str) -> None: ...

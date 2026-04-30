@@ -1,4 +1,3 @@
-from typing import Union
 from uuid import uuid4
 
 from shared.domain import entities
@@ -7,7 +6,10 @@ from shared.domain import entities
 class QueueFactory:
     @staticmethod
     async def create_queue(
-        source: Union[entities.Track, entities.Album, entities.Playlist, list[entities.Track]],
+        source: entities.Track
+        | entities.Album
+        | entities.Playlist
+        | list[entities.Track],
     ) -> entities.TrackQueue:
         tracks = []
         if isinstance(source, entities.Track):

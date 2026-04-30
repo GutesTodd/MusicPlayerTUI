@@ -20,7 +20,7 @@ class YandexStreamer:
             if not direct_link:
                 direct_link = await best_quality_info.get_direct_link_async()
             logger.info(
-                f"Получена ссылка для трека {track_id} ({best_quality_info.bitrate_in_kbps} kbps)"
+                f"Получена ссылка для трека {track_id} ({best_quality_info.bitrate_in_kbps} kbps)"  # noqa: E501
             )
             return direct_link
 

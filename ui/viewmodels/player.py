@@ -1,4 +1,5 @@
 from loguru import logger
+
 from ui.utils.socket_client import SocketClient
 from ui.viewmodels.base import BaseViewModel
 
@@ -12,14 +13,30 @@ class PlayerViewModel(BaseViewModel):
         self.volume: int = 100
         self.position_ms: int = 0
         self.duration_ms: int = 225000  # Фиктивные 3:45 по умолчанию
+        self.repeat_mode: str = "none"  # "none", "all", "one"
+
+    async def toggle_repeat(self) -> None:
+        modes_cycle = ["none", "all", "one"]
+        next_mode = modes_cycle[
+            (modes_cycle.index(self.repeat_mode) + 1) % len(modes_cycle)
+        ]
+
+        response = await self._client.send_command(
+            "playback.set_play_mode", {"modes": next_mode}
+        )
+        if response is None:
+            return
+
+        if response.get("status") == "ok":
+            self.repeat_mode = next_mode
+            self.notify()
 
     async def play_media(self, media_id: str, media_type: str, title: str, artist: str):
         self.is_loading = True
         self.set_error(None)
         logger.info(f"ViewModel запрашивает воспроизведение: {media_type} {media_id}")
         response = await self._client.send_command(
-            "playback.play_media",
-            {"media_id": media_id, "media_type": media_type}
+            "playback.play_media", {"media_id": media_id, "media_type": media_type}
         )
         if response is None:
             return

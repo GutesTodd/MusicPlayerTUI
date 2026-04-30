@@ -1,8 +1,9 @@
 from loguru import logger
 from yandex_music import ClientAsync
 from yandex_music.exceptions import YandexMusicError
-from shared.domain import entities
+
 from backend.infrastructure.yandex.mapper import YandexMapper
+from shared.domain import entities
 
 
 class YandexSearcher:

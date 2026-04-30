@@ -1,14 +1,15 @@
 from dishka import FromDishka
 from loguru import logger
-from shared.infrastructure.socket.app import SocketRouter
+
 from shared.domain import entities
 from shared.domain.commands import (
-    SearchCommand,
-    SearchTracksCommand,
     SearchAlbumsCommand,
     SearchArtistsCommand,
+    SearchCommand,
+    SearchTracksCommand,
 )
 from shared.domain.interfaces import TrackSearcher
+from shared.infrastructure.socket.app import SocketRouter
 
 router = SocketRouter(SearchCommand)
 

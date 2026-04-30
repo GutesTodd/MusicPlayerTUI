@@ -1,11 +1,13 @@
-from uuid import uuid4
 from typing import Literal
+from uuid import uuid4
+
 from shared.domain import entities
 
 
 class InMemoryQueueManager:
     def __init__(self) -> None:
         self._queue = entities.TrackQueue(id=uuid4())
+        self.repeat_mode = "none"
 
     async def set_queue(self, queue: entities.TrackQueue) -> None:
         self._queue = queue
@@ -60,6 +62,11 @@ class InMemoryQueueManager:
     async def next_track(self) -> entities.Track | None:
         if not self._queue.current or not self._queue.current.next:
             return None
+        if self.repeat_mode == "one":
+            return self._queue.current.track
+        if not self._queue.current.next and self.repeat_mode == "all":
+            self._queue.current = self._queue.head
+            return self._queue.current.track if self._queue.current else None
         self._queue.current = self._queue.current.next
         return self._queue.current.track
 
@@ -90,3 +97,6 @@ class InMemoryQueueManager:
                 self._queue.length -= 1
                 break
             curr = curr.next
+
+    async def set_repeat_mode(self, mode: str) -> None:
+        self.repeat_mode = mode

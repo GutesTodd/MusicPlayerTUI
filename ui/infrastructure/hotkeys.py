@@ -1,4 +1,6 @@
-from typing import Callable, Final
+from collections.abc import Callable
+from typing import Final
+
 from loguru import logger
 from pynput import keyboard
 
@@ -34,7 +36,7 @@ class PynputHotkeyProvider(GlobalHotkeyProvider):
             self._listener.daemon = True
             self._listener.start()
             logger.info(
-                f"PynputHotkeyProvider запущен. Зарегистрировано {len(handlers)} клавиш."
+                f"PynputHotkeyProvider запущен. Зарегистрировано {len(handlers)} клавиш."  # noqa: E501
             )
         except Exception as e:
             logger.error(f"Не удалось запустить PynputHotkeyProvider: {e}")

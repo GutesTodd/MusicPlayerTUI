@@ -1,5 +1,7 @@
-from typing import Literal, Annotated, Union
+from typing import Annotated, Literal
+
 from pydantic import Field
+
 from shared.domain.common import BaseCommand
 
 
@@ -50,6 +52,11 @@ class GetQueueCommand(PlaybackCommand):
     action: Literal["playback.get_queue"] = "playback.get_queue"
 
 
+class ModePlayCommand(PlaybackCommand):
+    action: Literal["playback.set_play_mode"] = "playback.set_play_mode"
+    modes: Literal["none", "all", "one"]
+
+
 class PlayMyWaveCommand(BaseCommand):
     action: Literal["my_wave"] = "my_wave"
     mood: str | None = None
@@ -76,18 +83,16 @@ class PlayMediaCommand(PlaybackCommand):
 
 
 AnyCommand = Annotated[
-    Union[
-        SearchCommand,
-        PlayMyWaveCommand,
-        PlayMediaCommand,
-        PauseCommand,
-        ResumeCommand,
-        SetVolumeCommand,
-        NextTrackCommand,
-        PrevTrackCommand,
-        GetQueueCommand,
-        GetAuthCodeCommand,
-        GetAuthStatusCommand,
-    ],
+    SearchCommand
+    | PlayMyWaveCommand
+    | PlayMediaCommand
+    | PauseCommand
+    | ResumeCommand
+    | SetVolumeCommand
+    | NextTrackCommand
+    | PrevTrackCommand
+    | GetQueueCommand
+    | GetAuthCodeCommand
+    | GetAuthStatusCommand,
     Field(discriminator="action"),
 ]

@@ -1,7 +1,8 @@
-from pydantic import BaseModel, ConfigDict, Field
+from datetime import UTC, datetime
 from typing import Any
-from datetime import datetime, timezone
 from uuid import UUID, uuid4
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BaseEntity(BaseModel):
@@ -32,4 +33,4 @@ class BaseEvent(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     event_id: UUID = Field(default_factory=uuid4)
-    timestamp: float = Field(default_factory=datetime.now(timezone.utc).timestamp)
+    timestamp: float = Field(default_factory=datetime.now(UTC).timestamp)

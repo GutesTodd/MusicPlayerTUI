@@ -1,4 +1,3 @@
-from loguru import logger
 from ui.utils.socket_client import SocketClient
 from ui.viewmodels.base import BaseViewModel
 
@@ -13,13 +12,13 @@ class QueueViewModel(BaseViewModel):
     async def load_queue(self):
         self.is_loading = True
         self.notify()
-        
+
         response = await self._client.send_command("playback.get_queue")
         if response and response.get("status") == "ok":
             data = response.get("data", {})
             self.tracks = data.get("tracks", [])
             self.current_track_id = data.get("current_id")
-        
+
         self.is_loading = False
         self.notify()
 

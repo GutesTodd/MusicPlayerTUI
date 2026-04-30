@@ -1,12 +1,13 @@
 from loguru import logger
+
+from shared.domain.commands import PlayMediaCommand
+from shared.domain.factories import QueueFactory
 from shared.domain.interfaces import (
-    TrackProvider,
-    QueueManager,
     PlaybackController,
+    QueueManager,
+    TrackProvider,
     TrackStreamer,
 )
-from shared.domain.factories import QueueFactory
-from shared.domain.commands import PlayMediaCommand
 
 
 class PlayMediaUseCase:
@@ -24,7 +25,7 @@ class PlayMediaUseCase:
 
     async def execute(self, cmd: PlayMediaCommand) -> None:
         logger.info(
-            f"Запуск сценария воспроизведения медиа: {cmd.media_type} (id={cmd.media_id})"
+            f"Запуск сценария воспроизведения медиа: {cmd.media_type} (id={cmd.media_id})"  # noqa: E501
         )
 
         source = None

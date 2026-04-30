@@ -1,10 +1,10 @@
 import threading
 
-from textual.app import ComposeResult
-from textual.screen import Screen
-from textual.containers import Vertical, Center
-from textual.widgets import Select, Button, Label, Static
 from textual import on, work
+from textual.app import ComposeResult
+from textual.containers import Center, Vertical
+from textual.screen import Screen
+from textual.widgets import Button, Label, Select, Static
 
 from ui.viewmodels.auth import AuthViewModel
 
@@ -17,29 +17,28 @@ class AuthScreen(Screen):
         self.vm = viewmodel
 
     def compose(self) -> ComposeResult:
-        with Center():
-            with Vertical(id="auth_dialog"):
-                yield Label("Вход в Music Player", id="auth_title")
+        with Center(), Vertical(id="auth_dialog"):
+            yield Label("Вход в Music Player", id="auth_title")
 
-                # Контейнер выбора платформы
-                with Vertical(id="platform_selection"):
-                    yield Select(
-                        self.vm.platforms,
-                        prompt="Выберите сервис",
-                        id="platform_select",
-                    )
-                    yield Button("Получить код", variant="primary", id="btn_get_code")
+            # Контейнер выбора платформы
+            with Vertical(id="platform_selection"):
+                yield Select(
+                    self.vm.platforms,
+                    prompt="Выберите сервис",
+                    id="platform_select",
+                )
+                yield Button("Получить код", variant="primary", id="btn_get_code")
 
-                # Контейнер отображения кода (скрыт по умолчанию)
-                with Vertical(id="code_display"):
-                    yield Label(
-                        "Введите этот код на странице подтверждения:", id="instructions"
-                    )
-                    yield Label("", id="user_code_label")
-                    yield Static("", id="link_label")
-                    yield Label("Ожидание подтверждения...", id="polling_status")
+            # Контейнер отображения кода (скрыт по умолчанию)
+            with Vertical(id="code_display"):
+                yield Label(
+                    "Введите этот код на странице подтверждения:", id="instructions"
+                )
+                yield Label("", id="user_code_label")
+                yield Static("", id="link_label")
+                yield Label("Ожидание подтверждения...", id="polling_status")
 
-                yield Label("", id="auth_error")
+            yield Label("", id="auth_error")
 
     def on_mount(self) -> None:
         self.vm.subscribe(self.update_ui_state)

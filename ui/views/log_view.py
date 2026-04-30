@@ -1,7 +1,7 @@
-from textual.app import ComposeResult
-from textual.widgets import RichLog
-from textual.widget import Widget
 from loguru import logger
+from textual.app import ComposeResult
+from textual.widget import Widget
+from textual.widgets import RichLog
 
 
 class TextualLoggerSink:
@@ -18,11 +18,11 @@ class LogPanel(Widget):
         yield RichLog(id="system_logs", markup=True, highlight=True)
 
     def on_mount(self) -> None:
+        import contextlib
+
         rich_log = self.query_one("#system_logs", RichLog)
-        try:
+        with contextlib.suppress(Exception):
             logger.remove()
-        except Exception:
-            pass
 
         logger.add(
             TextualLoggerSink(rich_log, self.app),
