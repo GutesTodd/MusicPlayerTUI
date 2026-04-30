@@ -1,22 +1,22 @@
 import asyncio
+import contextlib
 import sys
-import os
-from loguru import logger
+from pathlib import Path
+
 from dishka import make_async_container
+from loguru import logger
 
-from shared.infrastructure.socket.app import SocketApp, setup_dishka
-
+from backend.contexts.auth.router import router as auth_router
+from backend.contexts.playback.router import router as playback_router
+from backend.contexts.search.router import router as search_router
 from backend.providers import (
-    YandexConfigProvider,
-    YandexProvider,
+    AuthProvider,
     PlayerProvider,
     UseCaseProvider,
-    AuthProvider,
+    YandexConfigProvider,
+    YandexProvider,
 )
-
-from backend.contexts.search.router import router as search_router
-from backend.contexts.playback.router import router as playback_router
-from backend.contexts.auth.router import router as auth_router
+from shared.infrastructure.socket.app import SocketApp, setup_dishka
 
 
 def setup_logger():
@@ -28,7 +28,7 @@ def setup_logger():
         level="DEBUG",
     )
     logger.add(
-        os.path.expanduser("log/yandex_music_backend/daemon.log"),
+        Path("log/yandex_music_backend/daemon.log").expanduser(),
         rotation="10 MB",
         level="INFO",
     )
@@ -59,7 +59,7 @@ async def main():
     )
     setup_dishka(container, app)
     logger.info("Зарегистрированные маршруты:")
-    for route in app.routes.keys():
+    for route in app.routes:
         logger.info(f"  -> {route}")
     try:
         await app.serve()
@@ -81,7 +81,5 @@ if __name__ == "__main__":
         logger.info("uvloop активирован")
     except ImportError:
         pass
-    try:
+    with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(main())
-    except KeyboardInterrupt:
-        pass

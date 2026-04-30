@@ -1,10 +1,12 @@
-import subprocess
-import time
-import sys
-import os
-import socket
-import signal
 import atexit
+import os
+import signal
+import socket
+import subprocess
+import sys
+import time
+from pathlib import Path
+
 from loguru import logger
 
 # Глобальная переменная для процесса бэкенда
@@ -46,13 +48,13 @@ def start_backend():
     logger.info("Запуск бэкенда...")
 
     # Создаем папку для логов, если её нет
-    log_dir = os.path.join(os.getcwd(), "logs")
-    os.makedirs(log_dir, exist_ok=True)
-    err_log = open(os.path.join(log_dir, "backend_errors.log"), "a")
+    log_dir = Path.cwd() / "logs"
+    log_dir.mkdir(parents=True, exist_ok=True)
+    err_log = (log_dir / "backend_errors.log").open("a")
 
     return subprocess.Popen(
         [sys.executable, "-m", "backend.main"],
-        cwd=os.getcwd(),
+        cwd=str(Path.cwd()),
         stdout=subprocess.DEVNULL,
         stderr=err_log,
     )
@@ -95,13 +97,13 @@ def main():
 
 if __name__ == "__main__":
     # Фиксируем рабочую директорию как корень проекта (где лежит launcher.py)
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = Path(__file__).parent.resolve()
     os.chdir(base_dir)
-    sys.path.append(base_dir)
+    sys.path.append(str(base_dir))
 
     # Проверка критических директорий
     for d in ["backend", "ui", "shared"]:
-        if not os.path.isdir(os.path.join(base_dir, d)):
+        if not (base_dir / d).is_dir():
             logger.error(f"Критическая ошибка: Директория {d} не найдена в {base_dir}")
             sys.exit(1)
 
