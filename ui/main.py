@@ -75,7 +75,6 @@ class MusicPlayerApp(App[None]):
         self.call_from_thread(self.run_action, action)
 
     def action_toggle_play(self) -> None:
-        """Toggle playback via Worker (Thread-safe)."""
         self.run_worker(self.player_vm.toggle_pause())
 
     def action_next_track(self) -> None:
@@ -94,7 +93,6 @@ class MusicPlayerApp(App[None]):
             self.run_worker(self.queue_vm.load_queue())
 
     def _tick_timer(self) -> None:
-        """Timer for updating progress."""
         if self.player_vm.is_playing:
             self.player_vm.position_ms += 1000
             if self.player_vm.position_ms > self.player_vm.duration_ms:
@@ -108,7 +106,6 @@ class MusicPlayerApp(App[None]):
         return f"{minutes:02d}:{seconds:02d}"
 
     def _on_player_update(self) -> None:
-        """React to PlayerViewModel changes."""
         try:
             if self.player_vm.current_track:
                 self.query_one("#current_track", TickerLabel).update_text(
@@ -117,7 +114,6 @@ class MusicPlayerApp(App[None]):
                 btn_play = self.query_one("#btn_play_pause", Button)
                 btn_play.label = "󰏤" if self.player_vm.is_playing else "󰐊"
 
-            # Update time and progress bar
             pos_str = self._format_time(self.player_vm.position_ms)
             dur_str = self._format_time(self.player_vm.duration_ms)
             self.query_one("#time_code", Label).update(f"{pos_str} / {dur_str}")
@@ -125,7 +121,6 @@ class MusicPlayerApp(App[None]):
             vol_bar = self.query_one("#volume_bar", ProgressBar)
             vol_bar.progress = float(self.player_vm.volume)
 
-            # Update repeat mode
             btn_repeat = self.query_one("#btn_repeat", Button)
             repeat_icons = {"none": "󰑗", "all": "󰑖", "one": "󰑘"}
             btn_repeat.label = repeat_icons.get(self.player_vm.repeat_mode, "󰑗")
