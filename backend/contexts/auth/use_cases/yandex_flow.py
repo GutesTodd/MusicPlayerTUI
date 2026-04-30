@@ -1,6 +1,8 @@
 import asyncio
+
 from loguru import logger
 from yandex_music import ClientAsync
+
 from backend.contexts.auth.domain import AuthSessionStore, AuthStatusEnum
 from backend.infrastructure.config.service import ConfigService
 
@@ -9,6 +11,7 @@ class YandexDeviceAuthFlow:
     def __init__(self, session_store: AuthSessionStore, config_service: ConfigService):
         self.session_store = session_store
         self.config_service = config_service
+        self._background_tasks = set()
 
     async def start_auth(self, global_client: ClientAsync):
         status = self.session_store.get_status()
@@ -30,13 +33,21 @@ class YandexDeviceAuthFlow:
             auth_task = asyncio.create_task(
                 fresh_client.device_auth(on_code=on_code_callback)
             )
+            self._background_tasks.add(auth_task)
+            auth_task.add_done_callback(self._background_tasks.discard)
+
             user_code, verification_url = await code_future
             self.session_store.update(
                 status=AuthStatusEnum.PENDING,
                 user_code=user_code,
                 verification_url=verification_url,
             )
-            asyncio.create_task(self._wait_for_completion(auth_task, global_client))
+            task = asyncio.create_task(
+                self._wait_for_completion(auth_task, global_client)
+            )
+            self._background_tasks.add(task)
+            task.add_done_callback(self._background_tasks.discard)
+
             return user_code, verification_url
 
         except Exception as e:

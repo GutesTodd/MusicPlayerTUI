@@ -1,11 +1,11 @@
 import asyncio
 import json
 from pathlib import Path
-from typing import Optional
 
 from loguru import logger
-from ui.viewmodels.base import BaseViewModel
+
 from ui.utils.socket_client import SocketClient
+from ui.viewmodels.base import BaseViewModel
 
 CONFIG_FILE = Path.home() / ".config" / "ym-cli" / "config.json"
 
@@ -17,16 +17,17 @@ class AuthViewModel(BaseViewModel):
         self.platforms = [
             ("Яндекс.Музыка", "yandex"),
         ]
-        self.auth_code: Optional[str] = None
-        self.auth_url: Optional[str] = None
+        self.auth_code: str | None = None
+        self.auth_url: str | None = None
         self.is_polling: bool = False
         self.is_authenticated_successfully: bool = False
+        self._tasks = set()
 
     def is_authenticated(self, platform: str = "yandex") -> bool:
         if not CONFIG_FILE.exists():
             return False
         try:
-            with open(CONFIG_FILE, "r") as f:
+            with CONFIG_FILE.open() as f:
                 data = json.load(f)
                 return bool(data.get(platform, {}).get("token"))
         except Exception:
@@ -50,12 +51,13 @@ class AuthViewModel(BaseViewModel):
                 self.is_polling = True
                 self.is_loading = False
                 self.notify()
-                asyncio.create_task(self._poll_auth_status(platform))
+                task = asyncio.create_task(self._poll_auth_status(platform))
+                self._tasks.add(task)
+                task.add_done_callback(self._tasks.discard)
                 return True
-            else:
-                error = response.get("error") if response else "Нет ответа от сервера"
-                self.set_error(f"Ошибка получения кода: {error}")
-                return False
+            error = response.get("error") if response else "Нет ответа от сервера"
+            self.set_error(f"Ошибка получения кода: {error}")
+            return False
         except Exception as e:
             self.set_error(f"Ошибка сети: {e}")
             return False
@@ -79,11 +81,11 @@ class AuthViewModel(BaseViewModel):
                     self.is_authenticated_successfully = True
                     self.notify()
                     break
-                elif status == "error":
+                if status == "error":
                     self.is_polling = False
                     self.set_error(response.get("error") or "Ошибка авторизации")
                     break
-                elif status == "idle":
+                if status == "idle":
                     self.is_polling = False
                     self.set_error("Сессия авторизации истекла")
                     break
