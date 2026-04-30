@@ -166,11 +166,6 @@ Screen {
     margin-left: 2;
 }
 
-#track_progress > .progress--bar {
-    color: $accent;
-    background: #404040;
-}
-
 #player_controls Button {
     min-width: 10;
     background: transparent;
@@ -182,7 +177,7 @@ Screen {
     color: $text;
 }
 
-#volume_bar > .progress--bar {
-    color: $accent;
-    background: #404040;
+#btn_repeat.-active {
+    color: $text;
+    text-style: bold;
 }
