@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*' # Запуск при пуше тега, например v1.0.0
+  workflow_dispatch: # Позволяет запускать вручную из вкладки Actions
 
 jobs:
   build-linux:
