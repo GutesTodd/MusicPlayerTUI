@@ -1,19 +1,21 @@
 from dataclasses import dataclass
-from enum import Enum
-from typing import Optional
+from enum import StrEnum
 
-class AuthStatusEnum(str, Enum):
+
+class AuthStatusEnum(StrEnum):
     IDLE = "idle"
     PENDING = "pending"
     SUCCESS = "success"
     ERROR = "error"
 
+
 @dataclass
 class AuthStatus:
     status: AuthStatusEnum = AuthStatusEnum.IDLE
-    user_code: Optional[str] = None
-    verification_url: Optional[str] = None
-    error_message: Optional[str] = None
+    user_code: str | None = None
+    verification_url: str | None = None
+    error_message: str | None = None
+
 
 class AuthSessionStore:
     def __init__(self):
