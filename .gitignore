@@ -216,7 +216,7 @@ __marimo__/
 
 # Gemini
 .agents/
-docs/O
+docs/
 
 
 # Streamlit
