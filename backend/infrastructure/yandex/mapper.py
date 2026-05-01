@@ -26,12 +26,35 @@ class YandexMapper:
         )
 
     @staticmethod
-    def map_artist(y_artist: YandexArtist) -> entities.Artist:
-        return entities.Artist(
+    def map_artist(
+        y_artist: YandexArtist,
+        popular_tracks: list[YandexTrack] | None = None,
+        albums: list[YandexAlbum] | None = None,
+    ) -> entities.Artist:
+        artist = entities.Artist(
             id=y_artist.id,
             name=y_artist.name if y_artist.name else "Неизвестный",
             cover_uri=y_artist.cover.uri if y_artist.cover else None,
         )
+
+        if popular_tracks is not None or albums is not None:
+            details = entities.ArtistDetails()
+            if popular_tracks:
+                details.popular_tracks = [
+                    YandexMapper.map_track(t) for t in popular_tracks
+                ]
+            if albums:
+                # В Яндекс Музыке синглы часто приходят вместе с альбомами,
+                # их можно отличить по полю type
+                for a in albums:
+                    mapped_album = YandexMapper.map_album(a)
+                    if mapped_album.type == "single":
+                        details.singles.append(mapped_album)
+                    else:
+                        details.albums.append(mapped_album)
+            artist.details = details
+
+        return artist
 
     @staticmethod
     def map_album(y_album: YandexAlbum) -> entities.Album:

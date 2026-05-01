@@ -181,3 +181,50 @@ Screen {
     color: $text;
     text-style: bold;
 }
+
+/* --- Catalog Details Styling --- */
+.detail-title {
+    color: $text;
+    text-style: bold;
+    font-size: 1;
+    margin: 1 2;
+}
+
+#btn_back {
+    background: transparent;
+    border: none;
+    color: $accent;
+    min-width: 12;
+}
+
+#btn_back:hover {
+    background: $surface;
+    text-style: bold;
+}
+
+#album_header, #artist_header {
+    height: 3;
+    background: $surface;
+    border-bottom: solid #282828;
+    align: left middle;
+}
+
+.detail-section {
+    margin: 0 2;
+    padding: 1 0;
+}
+
+TrackItem, AlbumItem {
+    width: 100%;
+    height: 3;
+    padding: 1 2;
+    transition: background 150ms;
+}
+
+TrackItem:hover, AlbumItem:hover {
+    background: #282828;
+}
+
+TrackItem Label, AlbumItem Label {
+    width: 100%;
+}

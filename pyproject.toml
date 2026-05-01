@@ -1,5 +1,5 @@
 [project]
-name = "yandex-music-cli"
+name = "music-player-tui"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -11,18 +11,14 @@ dependencies = [
   "pynput",
   "python-mpv>=1.0.8",
   "textual>=8.2.4",
-  "textual-dev>=1.8.0",
   "yandex-music[async]>=3.0.0",
 ]
 
 [tool.ruff]
-
 target-version = "py312"
-
 line-length = 88
 
 [tool.ruff.lint]
-
 select = [
   "E",
   "W",
@@ -45,7 +41,16 @@ select = [
   "RUF",
 ]
 
-ignore = ["D", "ANN", "PLR0913", "ARG001", "ARG002", "RUF001", "RUF002", "RUF003"]
+ignore = [
+  "D",
+  "ANN",
+  "PLR0913",
+  "ARG001",
+  "ARG002",
+  "RUF001",
+  "RUF002",
+  "RUF003",
+]
 
 fixable = ["ALL"]
 
@@ -64,4 +69,4 @@ line-ending = "auto"
 "tests/*" = ["S101", "ARG001"]
 
 [dependency-groups]
-dev = ["ruff>=0.15.12"]
+dev = ["ruff>=0.15.12", "textual-dev>=1.8.0"]

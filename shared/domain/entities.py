@@ -13,9 +13,16 @@ class RepeatMode(StrEnum):
     ALL = "all"
 
 
+class ArtistDetails(BaseEntity):
+    popular_tracks: list[Track] = Field(default_factory=list)
+    albums: list[Album] = Field(default_factory=list)
+    singles: list[Album] = Field(default_factory=list)
+
+
 class Artist(BaseEntity):
     name: str
     cover_uri: str | None = None
+    details: ArtistDetails | None = None
 
 
 class Album(BaseEntity):

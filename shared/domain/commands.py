@@ -57,6 +57,11 @@ class ModePlayCommand(PlaybackCommand):
     modes: Literal["none", "all", "one"]
 
 
+class SeekCommand(PlaybackCommand):
+    action: Literal["playback.seek"] = "playback.seek"
+    position_ms: int
+
+
 class PlayMyWaveCommand(BaseCommand):
     action: Literal["my_wave"] = "my_wave"
     mood: str | None = None

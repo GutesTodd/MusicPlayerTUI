@@ -74,14 +74,15 @@ class PlayerViewModel(BaseViewModel):
 
     async def set_volume(self, new_volume: int) -> None:
         safe_volume = max(0, min(100, new_volume))
+        self.volume = safe_volume
+        self.notify()
         response = await self._client.send_command(
             "playback.set_volume", {"volume": safe_volume}
         )
         if response is None:
             return
-        if response.get("status") == "ok":
-            self.volume = safe_volume
-            self.notify()
+        if response.get("status") != "ok":
+            logger.error(f"Не удалось установить громкость: {response.get('error')}")
 
     async def seek(self, position_ms: int) -> None:
         logger.info(f"Запрос на перемотку: {position_ms}ms")

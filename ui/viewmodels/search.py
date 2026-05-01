@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from loguru import logger
 
 from shared.domain.entities import Album, Artist, Track
@@ -6,60 +8,117 @@ from ui.utils.socket_client import SocketClient
 from .base import BaseViewModel
 
 
-class SearchViewModel(BaseViewModel):
-    def __init__(self, client: SocketClient):
+class BaseSearchViewModel(BaseViewModel):
+    def __init__(self, client: SocketClient, search_type: str):
         super().__init__()
         self._client = client
         self.results: list[Track | Album | Artist] = []
         self.last_query: str = ""
-        self.search_type: str = "track"
+        self.search_type = search_type
 
-    async def search(self, query: str, search_type: str = "track") -> None:
+    async def search(self, query: str) -> None:
         if not query.strip():
             return
-
-        self.search_type = search_type
-        # Разрешенные типы поиска согласно бэкенду
-        # search.tracks, search.albums, search.artists
-        if search_type == "track":
-            action = "search.tracks"
-        elif search_type == "album":
-            action = "search.albums"
-        elif search_type == "artist":
-            action = "search.artists"
-        else:
-            action = "search.tracks"
 
         self.last_query = query
         self.is_loading = True
         self.results = []
         self.set_error(None)
-        logger.info(f"Ищем {search_type} по запросу: {query} (action: {action})")
+
+        action = f"search.{self.search_type}s"
+        logger.info(f"Ищем {self.search_type} по запросу: {query} (action: {action})")
+
         response = await self._client.send_command(
             action, {"query": query, "limit": 20}
         )
-        logger.debug(f"Ответ от сервера поиска: {response}")
 
+        self.is_loading = False
         if response is None:
-            self.is_loading = False
             self.set_error("Нет ответа от сервера")
             self.notify()
             return
 
-        self.is_loading = False
         if response.get("status") == "ok":
             raw_data = response.get("data") or []
             self.results = []
             for item in raw_data:
                 try:
-                    if search_type == "track":
-                        self.results.append(Track.model_validate(item))
-                    elif search_type == "album":
-                        self.results.append(Album.model_validate(item))
-                    elif search_type == "artist":
-                        self.results.append(Artist.model_validate(item))
+                    self.results.append(self._validate_item(item))
                 except Exception as e:
-                    logger.error(f"Ошибка валидации {search_type}: {e}")
+                    logger.error(f"Ошибка валидации {self.search_type}: {e}")
         else:
             self.set_error(response.get("error", "Ошибка поиска"))
         self.notify()
+
+    def _validate_item(self, item: dict) -> Track | Album | Artist:
+        raise NotImplementedError
+
+
+class SearchTrackViewModel(BaseSearchViewModel):
+    def __init__(self, client: SocketClient):
+        super().__init__(client, "track")
+
+    def _validate_item(self, item: dict) -> Track:
+        return Track.model_validate(item)
+
+
+class SearchAlbumViewModel(BaseSearchViewModel):
+    def __init__(self, client: SocketClient):
+        super().__init__(client, "album")
+
+    def _validate_item(self, item: dict) -> Album:
+        return Album.model_validate(item)
+
+
+class SearchArtistViewModel(BaseSearchViewModel):
+    def __init__(self, client: SocketClient):
+        super().__init__(client, "artist")
+
+    def _validate_item(self, item: dict) -> Artist:
+        return Artist.model_validate(item)
+
+
+# Для обратной совместимости, если нужно, но лучше обновить места использования
+class SearchViewModel(BaseViewModel):
+    """Композитный ViewModel, управляющий тремя типами поиска."""
+
+    def __init__(self, client: SocketClient):
+        super().__init__()
+        self.tracks = SearchTrackViewModel(client)
+        self.albums = SearchAlbumViewModel(client)
+        self.artists = SearchArtistViewModel(client)
+        self.current_type: str = "track"
+
+        # Передаем уведомления от дочерних VM наверх
+        self.tracks.subscribe(self.notify)
+        self.albums.subscribe(self.notify)
+        self.artists.subscribe(self.notify)
+
+    @property
+    def current(self) -> BaseSearchViewModel:
+        if self.current_type == "album":
+            return self.albums
+        if self.current_type == "artist":
+            return self.artists
+        return self.tracks
+
+    async def search(self, query: str, search_type: str = "track") -> None:
+        self.current_type = search_type
+        await self.current.search(query)
+        self.notify()
+
+    @property
+    def results(self):
+        return self.current.results
+
+    @property
+    def is_loading(self):
+        return self.current.is_loading
+
+    @property
+    def error_message(self):
+        return self.current.error_message
+
+    @property
+    def last_query(self):
+        return self.current.last_query

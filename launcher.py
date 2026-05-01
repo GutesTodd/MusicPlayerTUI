@@ -58,7 +58,7 @@ def main():
     global backend_proc  # noqa: PLW0603
     if not is_port_open("127.0.0.1", 8888):
         backend_proc = start_backend()
-        for _ in range(10):
+        for _ in range(26):
             if is_port_open("127.0.0.1", 8888):
                 logger.success("Бэкенд успешно запущен.")
                 break

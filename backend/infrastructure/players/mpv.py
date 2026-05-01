@@ -17,6 +17,9 @@ class MpvAudioPlayer:
     async def set_volume(self, volume_level: int) -> None:
         self._player.volume = volume_level
 
+    def set_position_ms(self, time_pos: int) -> None:
+        self._player.time_pos = time_pos / 1000
+
     def get_position_ms(self) -> int:
         pos = self._player.time_pos
         return int(pos * 1000) if pos else 0

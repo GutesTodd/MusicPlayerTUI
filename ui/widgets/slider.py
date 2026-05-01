@@ -48,15 +48,18 @@ class InteractiveSlider(Widget, can_focus=True):
         if width <= 0:
             return Text("")
 
-        filled_width = int(self.value * width)
+        # Доступная ширина для полоски (исключая место под ползунок)
+        available_width = width - 1
+        filled_width = int(self.value * available_width)
+        unfilled_width = available_width - filled_width
 
         text = Text()
-        # Filled part
-        text.append("━" * max(0, filled_width - 1), style="#1DB954")
-        # Thumb
+        # Заполненная часть
+        text.append("━" * filled_width, style="#1DB954")
+        # Ползунок (Thumb)
         text.append("●", style="white" if not self._dragging else "#1DB954")
-        # Unfilled part
-        text.append("━" * max(0, width - filled_width), style="#A7A7A7")
+        # Незаполненная часть
+        text.append("━" * unfilled_width, style="#A7A7A7")
 
         return text
 

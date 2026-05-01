@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import contextlib
 from typing import Any, ClassVar, Final
 
+from loguru import logger
 from textual import on
 from textual.app import App, ComposeResult
 from textual.binding import Binding
@@ -80,6 +82,7 @@ class MusicPlayerApp(App[None]):
 
         self._hotkey_provider.start(self._on_hotkey)
         self.set_interval(1.0, self._tick_timer)
+        self._on_player_update()
 
     def _on_hotkey(self, action: str) -> None:
         self.call_from_thread(self.run_action, action)
@@ -131,36 +134,49 @@ class MusicPlayerApp(App[None]):
 
     def _on_player_update(self) -> None:
         try:
+            # Обновление информации о треке и кнопки плей
             if self.player_vm.current_track:
-                self.query_one("#current_track", TickerLabel).update_text(
-                    f"󰓇 {self.player_vm.current_track}"
-                )
+                with contextlib.suppress(Exception):
+                    self.query_one("#current_track", TickerLabel).update_text(
+                        f"󰓇 {self.player_vm.current_track}"
+                    )
+
+            with contextlib.suppress(Exception):
                 btn_play = self.query_one("#btn_play_pause", Button)
                 btn_play.label = "󰏤" if self.player_vm.is_playing else "󰐊"
 
+            # Таймкод
             pos_str = self._format_time(self.player_vm.position_ms)
             dur_str = self._format_time(self.player_vm.duration_ms)
-            self.query_one("#time_code", Label).update(f"{pos_str} / {dur_str}")
+            with contextlib.suppress(Exception):
+                self.query_one("#time_code", Label).update(f"{pos_str} / {dur_str}")
 
-            vol_bar = self.query_one("#volume_bar", InteractiveSlider)
-            if not vol_bar._dragging:
-                vol_bar.value = self.player_vm.volume / 100
+            # Громкость
+            with contextlib.suppress(Exception):
+                vol_bar = self.query_one("#volume_bar", InteractiveSlider)
+                if not vol_bar._dragging:
+                    vol_bar.value = self.player_vm.volume / 100
 
-            btn_repeat = self.query_one("#btn_repeat", Button)
-            repeat_icons = {"none": "󰑗", "all": "󰑖", "one": "󰑘"}
-            btn_repeat.label = repeat_icons.get(self.player_vm.repeat_mode, "󰑗")
-            if self.player_vm.repeat_mode != "none":
-                btn_repeat.add_class("-active")
-            else:
-                btn_repeat.remove_class("-active")
+            # Режим повтора
+            with contextlib.suppress(Exception):
+                btn_repeat = self.query_one("#btn_repeat", Button)
+                repeat_icons = {"none": "󰑗", "all": "󰑖", "one": "󰑘"}
+                btn_repeat.label = repeat_icons.get(self.player_vm.repeat_mode, "󰑗")
+                if self.player_vm.repeat_mode != "none":
+                    btn_repeat.add_class("-active")
+                else:
+                    btn_repeat.remove_class("-active")
 
-            track_progress = self.query_one("#track_progress", InteractiveSlider)
-            if self.player_vm.duration_ms > 0 and not track_progress._dragging:
-                track_progress.value = (
-                    self.player_vm.position_ms / self.player_vm.duration_ms
-                )
-        except Exception:
-            pass
+            # Прогресс трека
+            with contextlib.suppress(Exception):
+                track_progress = self.query_one("#track_progress", InteractiveSlider)
+                if self.player_vm.duration_ms > 0 and not track_progress._dragging:
+                    track_progress.value = (
+                        self.player_vm.position_ms / self.player_vm.duration_ms
+                    )
+
+        except Exception as e:
+            logger.error(f"Ошибка при обновлении UI плеера: {e}")
 
     @on(Button.Pressed, "#btn_repeat")
     def handle_repeat(self) -> None:

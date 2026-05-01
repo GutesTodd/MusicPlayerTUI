@@ -427,6 +427,43 @@ wheels = [
 ]
 
 [[package]]
+name = "music-player-tui"
+version = "0.1.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "dishka" },
+    { name = "loguru" },
+    { name = "pydantic" },
+    { name = "pynput" },
+    { name = "python-mpv" },
+    { name = "textual" },
+    { name = "yandex-music", extra = ["async"] },
+]
+
+[package.dev-dependencies]
+dev = [
+    { name = "ruff" },
+    { name = "textual-dev" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "dishka", specifier = ">=1.10.0" },
+    { name = "loguru", specifier = ">=0.7.3" },
+    { name = "pydantic", specifier = ">=2.13.3" },
+    { name = "pynput" },
+    { name = "python-mpv", specifier = ">=1.0.8" },
+    { name = "textual", specifier = ">=8.2.4" },
+    { name = "yandex-music", extras = ["async"], specifier = ">=3.0.0" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "ruff", specifier = ">=0.15.12" },
+    { name = "textual-dev", specifier = ">=1.8.0" },
+]
+
+[[package]]
 name = "platformdirs"
 version = "4.9.6"
 source = { registry = "https://pypi.org/simple" }
@@ -833,41 +870,6 @@ async = [
     { name = "aiofiles" },
     { name = "aiohttp" },
 ]
-
-[[package]]
-name = "yandex-music-cli"
-version = "0.1.0"
-source = { virtual = "." }
-dependencies = [
-    { name = "dishka" },
-    { name = "loguru" },
-    { name = "pydantic" },
-    { name = "pynput" },
-    { name = "python-mpv" },
-    { name = "textual" },
-    { name = "textual-dev" },
-    { name = "yandex-music", extra = ["async"] },
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "ruff" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "dishka", specifier = ">=1.10.0" },
-    { name = "loguru", specifier = ">=0.7.3" },
-    { name = "pydantic", specifier = ">=2.13.3" },
-    { name = "pynput" },
-    { name = "python-mpv", specifier = ">=1.0.8" },
-    { name = "textual", specifier = ">=8.2.4" },
-    { name = "textual-dev", specifier = ">=1.8.0" },
-    { name = "yandex-music", extras = ["async"], specifier = ">=3.0.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [{ name = "ruff", specifier = ">=0.15.12" }]
 
 [[package]]
 name = "yarl"

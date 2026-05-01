@@ -9,9 +9,15 @@ from shared.domain.commands import (
     PlayMediaCommand,
     PrevTrackCommand,
     ResumeCommand,
+    SeekCommand,
     SetVolumeCommand,
 )
-from shared.domain.interfaces import PlaybackController, QueueManager, VolumeController
+from shared.domain.interfaces import (
+    PlaybackController,
+    PlaybackMonitor,
+    QueueManager,
+    VolumeController,
+)
 from shared.infrastructure.socket.app import SocketRouter
 
 from .use_cases.get_queue import GetQueueUseCase
@@ -75,4 +81,16 @@ async def resume(
 
 
 @router.handler
-async def set_play_mode(cmd: ModePlayCommand, queue_manager: QueueManager): ...
+async def set_play_mode(
+    cmd: ModePlayCommand, queue_manager: FromDishka[QueueManager]
+) -> bool:
+    await queue_manager.set_repeat_mode(cmd.modes)
+    return True
+
+
+@router.handler
+async def set_position_ms(
+    cmd: SeekCommand, controller: FromDishka[PlaybackMonitor]
+) -> bool:
+    controller.set_position_ms(cmd.position_ms)
+    return True
