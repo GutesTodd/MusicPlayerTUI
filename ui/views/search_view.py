@@ -4,9 +4,9 @@ import contextlib
 
 from textual import on
 from textual.app import ComposeResult
-from textual.containers import ContentSwitcher, Horizontal, Vertical, VerticalScroll
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.message import Message
-from textual.widgets import Button, Input, Label, Static
+from textual.widgets import Button, ContentSwitcher, Input, Label, Static
 
 from shared.domain.entities import Album, Artist, Track
 from ui.viewmodels.catalog import AlbumDetailViewModel, ArtistDetailViewModel
@@ -166,12 +166,12 @@ class SearchView(Static):
             indicator = self.query_one("#loading_indicator", Label)
             results_container = self.query_one("#search_results", VerticalScroll)
             if self.vm.is_loading:
-                indicator.update("⏳ Ищем в Яндексе...")
+                indicator.update("Ищем в Яндексе...")
                 return
             indicator.update("")
             results_container.remove_children()
             if self.vm.error_message:
-                results_container.mount(Label(f"❌ Ошибка: {self.vm.error_message}"))
+                results_container.mount(Label(f"Ошибка: {self.vm.error_message}"))
                 return
             if not self.vm.results:
                 if self.vm.last_query:

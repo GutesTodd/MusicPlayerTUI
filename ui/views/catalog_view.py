@@ -5,6 +5,7 @@ import contextlib
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical, VerticalScroll
+from textual.message import Message
 from textual.widgets import Button, Label, Static
 
 from shared.domain.entities import Album, Track
@@ -22,7 +23,6 @@ class TrackItem(Static):
         )
 
     def on_click(self) -> None:
-        # В идеале через сообщение, но для краткости дергаем VM плеера напрямую через app
         self.app.run_worker(
             self.app.player_vm.play_media(
                 media_id=str(self.track.id),
@@ -44,7 +44,7 @@ class AlbumItem(Static):
     def on_click(self) -> None:
         self.post_message(self.Selected(self.album))
 
-    class Selected(Static.Message):
+    class Selected(Message):
         def __init__(self, album: Album):
             self.album = album
             super().__init__()
@@ -76,16 +76,15 @@ class AlbumDetailView(Static):
                 return
 
             if self.vm.error_message:
-                self.query_one("#album_title", Label).update(
-                    f"❌ {self.vm.error_message}"
-                )
+                self.query_one("#album_title", Label).update(f"{self.vm.error_message}")
                 return
 
             if self.vm.album:
                 album = self.vm.album
                 self.query_one("#album_title", Label).update(f"󰓀 {album.title}")
                 self.query_one("#album_info", Label).update(
-                    f"Исполнитель: {', '.join(a.name for a in album.artists)} | Год: {album.year or '?'}"
+                    f"Исполнитель: {', '.join(a.name for a in album.artists)}"
+                    f"| Год: {album.year or '?'}"
                 )
 
                 tracks_container = self.query_one("#album_tracks", VerticalScroll)
@@ -100,7 +99,7 @@ class AlbumDetailView(Static):
     def handle_back(self) -> None:
         self.post_message(self.GoBack())
 
-    class GoBack(Static.Message):
+    class GoBack(Message):
         pass
 
 
@@ -133,13 +132,11 @@ class ArtistDetailView(Static):
     def on_data_changed(self) -> None:
         with contextlib.suppress(Exception):
             if self.vm.is_loading:
-                self.query_one("#artist_name", Label).update("⏳ Загрузка артиста...")
+                self.query_one("#artist_name", Label).update("Загрузка артиста...")
                 return
 
             if self.vm.error_message:
-                self.query_one("#artist_name", Label).update(
-                    f"❌ {self.vm.error_message}"
-                )
+                self.query_one("#artist_name", Label).update(f"{self.vm.error_message}")
                 return
 
             if self.vm.artist:
@@ -147,19 +144,14 @@ class ArtistDetailView(Static):
                 self.query_one("#artist_name", Label).update(f"󰓦 {artist.name}")
 
                 if artist.details:
-                    # Популярные треки
                     pop_container = self.query_one("#popular_tracks", Vertical)
                     pop_container.remove_children()
                     for track in artist.details.popular_tracks:
                         pop_container.mount(TrackItem(track))
-
-                    # Альбомы
                     alb_container = self.query_one("#artist_albums", Vertical)
                     alb_container.remove_children()
                     for album in artist.details.albums:
                         alb_container.mount(AlbumItem(album))
-
-                    # Синглы
                     sin_container = self.query_one("#artist_singles", Vertical)
                     sin_container.remove_children()
                     for single in artist.details.singles:
@@ -173,10 +165,10 @@ class ArtistDetailView(Static):
     def on_album_selected(self, event: AlbumItem.Selected) -> None:
         self.post_message(self.AlbumRequested(event.album.id))
 
-    class GoBack(Static.Message):
+    class GoBack(Message):
         pass
 
-    class AlbumRequested(Static.Message):
+    class AlbumRequested(Message):
         def __init__(self, album_id: str):
             self.album_id = album_id
             super().__init__()
