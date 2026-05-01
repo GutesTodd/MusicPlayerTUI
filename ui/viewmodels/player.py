@@ -12,8 +12,8 @@ class PlayerViewModel(BaseViewModel):
         self.is_playing: bool = False
         self.volume: int = 100
         self.position_ms: int = 0
-        self.duration_ms: int = 225000  # Фиктивные 3:45 по умолчанию
-        self.repeat_mode: str = "none"  # "none", "all", "one"
+        self.duration_ms: int = 225000
+        self.repeat_mode: str = "none"
 
     async def toggle_repeat(self) -> None:
         modes_cycle = ["none", "all", "one"]
@@ -44,7 +44,7 @@ class PlayerViewModel(BaseViewModel):
         if response.get("status") == "ok":
             self.current_track = f"{artist} — {title}" if artist else title
             self.is_playing = True
-            self.position_ms = 0  # Сброс времени при новом треке
+            self.position_ms = 0
             self.notify()
         else:
             self.set_error(response.get("error", "Неизвестная ошибка воспроизведения"))

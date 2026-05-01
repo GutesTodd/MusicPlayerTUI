@@ -78,18 +78,17 @@ class SearchArtistViewModel(BaseSearchViewModel):
         return Artist.model_validate(item)
 
 
-# Для обратной совместимости, если нужно, но лучше обновить места использования
 class SearchViewModel(BaseViewModel):
     """Композитный ViewModel, управляющий тремя типами поиска."""
 
     def __init__(self, client: SocketClient):
         super().__init__()
+        self._client = client
         self.tracks = SearchTrackViewModel(client)
         self.albums = SearchAlbumViewModel(client)
         self.artists = SearchArtistViewModel(client)
         self.current_type: str = "track"
 
-        # Передаем уведомления от дочерних VM наверх
         self.tracks.subscribe(self.notify)
         self.albums.subscribe(self.notify)
         self.artists.subscribe(self.notify)
@@ -115,9 +114,19 @@ class SearchViewModel(BaseViewModel):
     def is_loading(self):
         return self.current.is_loading
 
+    @is_loading.setter
+    def is_loading(self, value):
+        # Игнорируем установку, так как состояние берется из вложенных ViewModel
+        pass
+
     @property
     def error_message(self):
         return self.current.error_message
+
+    @error_message.setter
+    def error_message(self, value):
+        # Игнорируем установку
+        pass
 
     @property
     def last_query(self):

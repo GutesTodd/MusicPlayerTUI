@@ -62,6 +62,20 @@ class SeekCommand(PlaybackCommand):
     position_ms: int
 
 
+class CatalogCommand(BaseCommand):
+    action: Literal["catalog"] = "catalog"
+
+
+class GetAlbumCatalogCommand(CatalogCommand):
+    action: Literal["catalog.get_album"] = "catalog.get_album"
+    album_id: str
+
+
+class GetArtistCatalogCommand(CatalogCommand):
+    action: Literal["catalog.get_artist"] = "catalog.get_artist"
+    artist_id: str
+
+
 class PlayMyWaveCommand(BaseCommand):
     action: Literal["my_wave"] = "my_wave"
     mood: str | None = None
@@ -98,6 +112,8 @@ AnyCommand = Annotated[
     | PrevTrackCommand
     | GetQueueCommand
     | GetAuthCodeCommand
-    | GetAuthStatusCommand,
+    | GetAuthStatusCommand
+    | GetAlbumCatalogCommand
+    | GetArtistCatalogCommand,
     Field(discriminator="action"),
 ]

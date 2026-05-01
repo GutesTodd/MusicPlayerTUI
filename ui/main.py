@@ -134,7 +134,6 @@ class MusicPlayerApp(App[None]):
 
     def _on_player_update(self) -> None:
         try:
-            # Обновление информации о треке и кнопки плей
             if self.player_vm.current_track:
                 with contextlib.suppress(Exception):
                     self.query_one("#current_track", TickerLabel).update_text(
@@ -145,19 +144,16 @@ class MusicPlayerApp(App[None]):
                 btn_play = self.query_one("#btn_play_pause", Button)
                 btn_play.label = "󰏤" if self.player_vm.is_playing else "󰐊"
 
-            # Таймкод
             pos_str = self._format_time(self.player_vm.position_ms)
             dur_str = self._format_time(self.player_vm.duration_ms)
             with contextlib.suppress(Exception):
                 self.query_one("#time_code", Label).update(f"{pos_str} / {dur_str}")
 
-            # Громкость
             with contextlib.suppress(Exception):
                 vol_bar = self.query_one("#volume_bar", InteractiveSlider)
                 if not vol_bar._dragging:
                     vol_bar.value = self.player_vm.volume / 100
 
-            # Режим повтора
             with contextlib.suppress(Exception):
                 btn_repeat = self.query_one("#btn_repeat", Button)
                 repeat_icons = {"none": "󰑗", "all": "󰑖", "one": "󰑘"}
@@ -167,7 +163,6 @@ class MusicPlayerApp(App[None]):
                 else:
                     btn_repeat.remove_class("-active")
 
-            # Прогресс трека
             with contextlib.suppress(Exception):
                 track_progress = self.query_one("#track_progress", InteractiveSlider)
                 if self.player_vm.duration_ms > 0 and not track_progress._dragging:

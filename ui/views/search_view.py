@@ -71,8 +71,6 @@ class SearchView(Static):
         self.vm = viewmodel
         self.vm.subscribe(self.on_data_changed)
         self.current_search_type = "track"
-
-        # ViewModels для деталей
         self.album_vm = AlbumDetailViewModel(self.vm._client)
         self.artist_vm = ArtistDetailViewModel(self.vm._client)
 
@@ -88,7 +86,6 @@ class SearchView(Static):
                 yield Label(id="loading_indicator")
                 yield VerticalScroll(id="search_results")
 
-            # Контейнеры для деталей будут монтироваться динамически
             yield Vertical(id="album_detail_wrapper")
             yield Vertical(id="artist_detail_wrapper")
 

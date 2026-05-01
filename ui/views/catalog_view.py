@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-import contextlib
-
+from loguru import logger
 from textual import on
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical, VerticalScroll
@@ -70,7 +69,7 @@ class AlbumDetailView(Static):
         self.app.run_worker(self.vm.load_album(self.album_id))
 
     def on_data_changed(self) -> None:
-        with contextlib.suppress(Exception):
+        try:
             if self.vm.is_loading:
                 self.query_one("#album_title", Label).update("⏳ Загрузка альбома...")
                 return
@@ -94,6 +93,8 @@ class AlbumDetailView(Static):
                         tracks_container.mount(TrackItem(track))
                 else:
                     tracks_container.mount(Label("Нет данных о треках"))
+        except Exception as e:
+            logger.error(f"Ошибка рендеринга AlbumDetailView: {e}")
 
     @on(Button.Pressed, "#btn_back")
     def handle_back(self) -> None:
@@ -130,7 +131,7 @@ class ArtistDetailView(Static):
         self.app.run_worker(self.vm.load_artist(self.artist_id))
 
     def on_data_changed(self) -> None:
-        with contextlib.suppress(Exception):
+        try:
             if self.vm.is_loading:
                 self.query_one("#artist_name", Label).update("Загрузка артиста...")
                 return
@@ -156,6 +157,8 @@ class ArtistDetailView(Static):
                     sin_container.remove_children()
                     for single in artist.details.singles:
                         sin_container.mount(AlbumItem(single))
+        except Exception as e:
+            logger.error(f"Ошибка рендеринга ArtistDetailView: {e}")
 
     @on(Button.Pressed, "#btn_back")
     def handle_back(self) -> None:

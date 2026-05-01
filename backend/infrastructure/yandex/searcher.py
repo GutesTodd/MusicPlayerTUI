@@ -31,7 +31,7 @@ class YandexSearcher:
         self, query: str, limit: int = 10
     ) -> list[entities.Album] | None:
         try:
-            result = await self._client.search(text=query, limit=limit, type_="album")
+            result = await self._client.search(text=query, type_="album")
             if not result or not result.albums or not result.albums.results:
                 return None
             return [
@@ -45,7 +45,7 @@ class YandexSearcher:
         self, query: str, limit: int = 10
     ) -> list[entities.Artist] | None:
         try:
-            result = await self._client.search(text=query, limit=limit, type_="artist")
+            result = await self._client.search(text=query, type_="artist")
             if not result or not result.artists or not result.artists.results:
                 return None
             return [

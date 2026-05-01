@@ -1,4 +1,4 @@
-from yandex_music import Album, ClientAsync, Playlist
+from yandex_music import ClientAsync, Playlist
 
 from backend.infrastructure.yandex.mapper import YandexMapper
 from shared.domain import entities
@@ -15,9 +15,9 @@ class YandexTrackProvider:
         return None
 
     async def get_album_tracks(self, album_id: str) -> entities.Album | None:
-        y_album = await self._client.albums(album_ids=album_id)
-        if y_album and isinstance(y_album, Album):
-            return YandexMapper.map_album(y_album=y_album)
+        y_albums = await self._client.albums(album_ids=[album_id])
+        if y_albums:
+            return YandexMapper.map_album(y_album=y_albums[0])
         return None
 
     async def get_track(self, track_id: int) -> entities.Track | None:
@@ -26,8 +26,22 @@ class YandexTrackProvider:
             return YandexMapper.map_track(y_tracks[0])
         return None
 
-    async def get_artist_tracks(self, artist_id: str) -> list[entities.Track] | None:
-        y_artist_tracks = await self._client.artists_tracks(artist_id=artist_id)
-        if y_artist_tracks:
-            return [YandexMapper.map_track(t) for t in y_artist_tracks.tracks]
-        return None
+    async def get_artist_details(self, artist_id: str) -> entities.Artist | None:
+        brief_info = await self._client.artists_brief_info(artist_id=artist_id)
+        if not brief_info or not brief_info.artist:
+            return None
+
+        y_artist = brief_info.artist
+        pop_tracks = brief_info.popular_tracks or []
+
+        # Собираем все альбомы и дедуплицируем по ID
+        albums_dict = {a.id: a for a in (brief_info.albums or [])}
+        for a in brief_info.also_albums or []:
+            if a.id not in albums_dict:
+                albums_dict[a.id] = a
+
+        all_albums = list(albums_dict.values())
+
+        return YandexMapper.map_artist(
+            y_artist=y_artist, popular_tracks=pop_tracks, albums=all_albums
+        )

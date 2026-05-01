@@ -26,9 +26,10 @@ class AlbumDetailViewModel(BaseViewModel):
         )
 
         self.is_loading = False
-        if response and response.get("status") == "ok":
+        logger.debug(response)
+        if response:
             try:
-                self.album = Album.model_validate(response.get("data"))
+                self.album = Album.model_validate(response)
             except Exception as e:
                 logger.error(f"Ошибка валидации альбома: {e}")
                 self.set_error("Ошибка обработки данных альбома")
@@ -59,9 +60,10 @@ class ArtistDetailViewModel(BaseViewModel):
         )
 
         self.is_loading = False
-        if response and response.get("status") == "ok":
+        logger.debug(response)
+        if response:
             try:
-                self.artist = Artist.model_validate(response.get("data"))
+                self.artist = Artist.model_validate(response)
             except Exception as e:
                 logger.error(f"Ошибка валидации артиста: {e}")
                 self.set_error("Ошибка обработки данных артиста")

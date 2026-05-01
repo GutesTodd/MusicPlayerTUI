@@ -1,4 +1,19 @@
 /* --- Search View (Spotify Style) --- */
+#search_view {
+    height: 1fr;
+    width: 1fr;
+}
+
+#search_switcher {
+    height: 1fr;
+    width: 1fr;
+}
+
+#search_main {
+    height: 1fr;
+    width: 1fr;
+}
+
 #search_container {
     padding: 2 4;
     background: #000000;

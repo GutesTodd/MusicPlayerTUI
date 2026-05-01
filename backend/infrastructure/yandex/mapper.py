@@ -38,14 +38,12 @@ class YandexMapper:
         )
 
         if popular_tracks is not None or albums is not None:
-            details = entities.ArtistDetails()
+            details = entities.ArtistDetails(id=y_artist.id)
             if popular_tracks:
                 details.popular_tracks = [
                     YandexMapper.map_track(t) for t in popular_tracks
                 ]
             if albums:
-                # В Яндекс Музыке синглы часто приходят вместе с альбомами,
-                # их можно отличить по полю type
                 for a in albums:
                     mapped_album = YandexMapper.map_album(a)
                     if mapped_album.type == "single":

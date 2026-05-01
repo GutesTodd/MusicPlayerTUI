@@ -7,6 +7,7 @@ from dishka import make_async_container
 from loguru import logger
 
 from backend.contexts.auth.router import router as auth_router
+from backend.contexts.catalog.router import router as catalog_router
 from backend.contexts.playback.router import router as playback_router
 from backend.contexts.search.router import router as search_router
 from backend.providers import (
@@ -41,6 +42,7 @@ def create_app() -> SocketApp:
     app.include_router(search_router)
     app.include_router(playback_router)
     app.include_router(auth_router)
+    app.include_router(catalog_router)
 
     return app
 

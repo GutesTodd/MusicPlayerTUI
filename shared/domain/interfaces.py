@@ -36,9 +36,7 @@ class TrackProvider(Protocol):
 
     async def get_track(self, track_id: int) -> entities.Track | None: ...
 
-    async def get_artist_tracks(
-        self, artist_id: str
-    ) -> list[entities.Track] | None: ...
+    async def get_artist_details(self, artist_id: str) -> entities.Artist | None: ...
 
 
 class PlaybackController(Protocol):
