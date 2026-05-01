@@ -223,4 +223,5 @@ docs/
 .streamlit/secrets.toml
 
 # Projects
-logs
+log/
+logs/
