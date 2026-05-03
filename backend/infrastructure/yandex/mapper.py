@@ -1,3 +1,4 @@
+from loguru import logger
 from yandex_music import (
     Album as YandexAlbum,
     Artist as YandexArtist,
@@ -56,6 +57,7 @@ class YandexMapper:
 
     @staticmethod
     def map_album(y_album: YandexAlbum) -> entities.Album:
+        logger.debug(f"Альбом: {y_album}")
         album = entities.Album(
             id=y_album.id,
             title=y_album.title if y_album.title else "Неизвестно",

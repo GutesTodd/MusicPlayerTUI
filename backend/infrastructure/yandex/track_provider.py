@@ -15,9 +15,9 @@ class YandexTrackProvider:
         return None
 
     async def get_album_tracks(self, album_id: str) -> entities.Album | None:
-        y_albums = await self._client.albums(album_ids=[album_id])
+        y_albums = await self._client.albumsWithTracks(album_id=album_id)
         if y_albums:
-            return YandexMapper.map_album(y_album=y_albums[0])
+            return YandexMapper.map_album(y_album=y_albums)
         return None
 
     async def get_track(self, track_id: int) -> entities.Track | None:
@@ -34,7 +34,6 @@ class YandexTrackProvider:
         y_artist = brief_info.artist
         pop_tracks = brief_info.popular_tracks or []
 
-        # Собираем все альбомы и дедуплицируем по ID
         albums_dict = {a.id: a for a in (brief_info.albums or [])}
         for a in brief_info.also_albums or []:
             if a.id not in albums_dict:

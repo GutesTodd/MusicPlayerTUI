@@ -22,7 +22,7 @@ class AlbumDetailViewModel(BaseViewModel):
 
         logger.info(f"Загрузка деталей альбома: {album_id}")
         response = await self._client.send_command(
-            "catalog.get_album", {"album_id": album_id}
+            "catalog.get_album", {"album_id": str(album_id)}
         )
 
         self.is_loading = False
