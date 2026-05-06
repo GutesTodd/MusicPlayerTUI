@@ -12,6 +12,7 @@ from backend.contexts.playback.router import router as playback_router
 from backend.contexts.search.router import router as search_router
 from backend.providers import (
     AuthProvider,
+    DatabaseProvider,
     PlayerProvider,
     UseCaseProvider,
     YandexConfigProvider,
@@ -58,6 +59,7 @@ async def main():
         PlayerProvider(),
         UseCaseProvider(),
         AuthProvider(),
+        DatabaseProvider(),
     )
     setup_dishka(container, app)
     logger.info("Зарегистрированные маршруты:")

@@ -1,17 +1,20 @@
-LogPanel {
+#log_panel {
     dock: bottom;
     height: 15;
-    border-top: tall #1DB954; /* $accent */
-    background: #121212;      /* $panel_bg */
+    border-top: tall #1DB954;
+    background: #121212;
     display: none;
     layer: logs;
 }
 
-LogPanel.-visible {
+#log_panel.-visible {
     display: block;
 }
 
 #system_logs {
+    height: 1fr;
+    width: 100%;
     padding: 0 1;
-    color: #A7A7A7;           /* $text-muted */
+    color: #FFFFFF;
+    background: transparent;
 }

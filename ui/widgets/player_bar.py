@@ -78,13 +78,11 @@ class PlayerBar(Static):
 
     @on(InteractiveSlider.Changed, "#volume_bar")
     def on_volume_change(self, event: InteractiveSlider.Changed) -> None:
-        # Update volume in real-time
         self.app.player_vm.volume = int(event.value * 100)
         self.run_worker(self.app.player_vm.set_volume(self.app.player_vm.volume))
 
     @on(InteractiveSlider.Changed, "#track_progress")
     def on_track_progress_dragging(self, event: InteractiveSlider.Changed) -> None:
-        # Just update UI time code while dragging
         self.app.player_vm.position_ms = int(
             event.value * self.app.player_vm.duration_ms
         )

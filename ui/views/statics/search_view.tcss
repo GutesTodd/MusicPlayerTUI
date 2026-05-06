@@ -51,13 +51,15 @@
 
 #search_input {
     background: #242424;
-    border: none;
+    border: tall transparent;
     color: #1DB954; /* $accent */
     margin-bottom: 2;
+    height: 3;
+    content-align: center middle;
 }
 
 #search_input:focus {
-    border: solid #1DB954; /* $accent */
+    border: tall #1DB954; /* $accent */
     background: #2A2A2A;
 }
 

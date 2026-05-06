@@ -23,12 +23,14 @@ class MediaItem(Static):
             media_type: str,
             title: str,
             artist: str,
+            duration_ms: int = 0,
         ) -> None:
             self.item = item
             self.media_id = media_id
             self.media_type = media_type
             self.title = title
             self.artist = artist
+            self.duration_ms = duration_ms
             super().__init__()
 
         @property
@@ -36,13 +38,20 @@ class MediaItem(Static):
             return self.item
 
     def __init__(
-        self, media_id: str, media_type: str, title: str, artist: str, **kwargs
+        self,
+        media_id: str,
+        media_type: str,
+        title: str,
+        artist: str,
+        duration_ms: int = 0,
+        **kwargs,
     ):
         super().__init__(**kwargs)
         self.media_id = media_id
         self.media_type = media_type
         self.title = title
         self.artist = artist
+        self.duration_ms = duration_ms
         self.can_focus = True
 
     def compose(self) -> ComposeResult:
@@ -61,7 +70,14 @@ class MediaItem(Static):
 
     def on_click(self) -> None:
         self.post_message(
-            self.Selected(self, self.media_id, self.media_type, self.title, self.artist)
+            self.Selected(
+                self,
+                self.media_id,
+                self.media_type,
+                self.title,
+                self.artist,
+                self.duration_ms,
+            )
         )
 
 
@@ -73,6 +89,9 @@ class SearchView(Static):
         self.current_search_type = "track"
         self.album_vm = AlbumDetailViewModel(self.vm._client)
         self.artist_vm = ArtistDetailViewModel(self.vm._client)
+
+    def on_unmount(self) -> None:
+        self.vm.unsubscribe(self.on_data_changed)
 
     def compose(self) -> ComposeResult:
         with ContentSwitcher(initial="search_main", id="search_switcher"):
@@ -125,6 +144,7 @@ class SearchView(Static):
                 media_type=event.media_type,
                 title=event.title,
                 artist=event.artist,
+                duration_ms=event.duration_ms,
             )
         elif event.media_type == "album":
             self._show_album_detail(event.media_id)
@@ -183,6 +203,7 @@ class SearchView(Static):
                             media_type="track",
                             title=item.title,
                             artist=", ".join(a.name for a in item.artists),
+                            duration_ms=item.duration_ms,
                         )
                     )
                 elif isinstance(item, Album):

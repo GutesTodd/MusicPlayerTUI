@@ -1,5 +1,6 @@
 from dishka import FromDishka
 
+from shared.domain import entities
 from shared.domain.commands import (
     GetQueueCommand,
     ModePlayCommand,
@@ -37,17 +38,21 @@ async def get_queue(
 @router.handler
 async def next_track(
     cmd: NextTrackCommand, use_case: FromDishka[MoveTrackUseCase]
-) -> bool:
-    await use_case.execute(direction="next")
-    return True
+) -> entities.Track | None:
+    track = await use_case.execute(
+        direction="next", response_from_button=cmd.response_from_button
+    )
+    return track if track else None
 
 
 @router.handler
 async def prev_track(
     cmd: PrevTrackCommand, use_case: FromDishka[MoveTrackUseCase]
-) -> bool:
-    await use_case.execute(direction="prev")
-    return True
+) -> entities.Track | None:
+    track = await use_case.execute(
+        direction="prev", response_from_button=cmd.response_from_button
+    )
+    return track if track else None
 
 
 @router.handler

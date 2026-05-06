@@ -8,6 +8,25 @@ class YandexTrackProvider:
     def __init__(self, client: ClientAsync) -> None:
         self._client = client
 
+    async def get_user_playlists(self) -> list[entities.Playlist] | None:
+        y_kinds = await self._client.users_playlists_kinds()
+        y_playlists = await self._client.users_playlists(kind=y_kinds)
+        if not y_playlists:
+            return None
+        return [YandexMapper.map_playlist(p) for p in y_playlists]
+
+    async def get_user_albums(self) -> list[entities.Album] | None:
+        y_albums = await self._client.users_likes_albums()
+        return (
+            [
+                YandexMapper.map_album(y_album=y_album.album)
+                for y_album in y_albums
+                if y_album.album
+            ]
+            if y_albums
+            else None
+        )
+
     async def get_playlist_tracks(self, playlist_id: str) -> entities.Playlist | None:
         y_playlist = await self._client.users_playlists(kind=playlist_id)
         if y_playlist and isinstance(y_playlist, Playlist):
@@ -27,14 +46,21 @@ class YandexTrackProvider:
         return None
 
     async def get_artist_details(self, artist_id: str) -> entities.Artist | None:
-        brief_info = await self._client.artists_brief_info(artist_id=artist_id)
+        brief_info = await self._client.artistsBriefInfo(artist_id=artist_id)
         if not brief_info or not brief_info.artist:
             return None
 
         y_artist = brief_info.artist
         pop_tracks = brief_info.popular_tracks or []
-
-        albums_dict = {a.id: a for a in (brief_info.albums or [])}
+        albums_dict = {
+            a.id: a
+            for a in (
+                await self._client.artistsDirectAlbums(
+                    artist_id=artist_id, page_size=100
+                )
+                or []
+            )
+        }
         for a in brief_info.also_albums or []:
             if a.id not in albums_dict:
                 albums_dict[a.id] = a

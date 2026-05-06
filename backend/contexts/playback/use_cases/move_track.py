@@ -1,5 +1,6 @@
 from loguru import logger
 
+from shared.domain.entities import Track
 from shared.domain.interfaces import PlaybackController, QueueManager, TrackStreamer
 
 
@@ -14,11 +15,13 @@ class MoveTrackUseCase:
         self.player = player
         self.streamer = streamer
 
-    async def execute(self, direction: str) -> None:
+    async def execute(self, direction: str, response_from_button: bool) -> Track | None:
         logger.info(f"Переключение трека: {direction}")
 
         if direction == "next":
-            track = await self.queue_manager.next_track()
+            track = await self.queue_manager.next_track(
+                response_from_button=response_from_button
+            )
         else:
             track = await self.queue_manager.prev_track()
 
@@ -26,5 +29,6 @@ class MoveTrackUseCase:
             stream_url = await self.streamer.get_stream_url(track.id)
             await self.player.play(stream_url)
             logger.info(f"Начато воспроизведение следующего трека: {track.title}")
-        else:
-            logger.warning(f"Больше нет треков в направлении {direction}")
+            return track
+        logger.warning(f"Больше нет треков в направлении {direction}")
+        return None

@@ -59,21 +59,32 @@ class InMemoryQueueManager:
                 else:
                     self._queue.tail = new_node
 
-    async def next_track(self) -> entities.Track | None:
+    async def next_track(self, response_from_button: bool) -> entities.Track | None:
         if not self._queue.current or not self._queue.current.next:
             return None
-        if self.repeat_mode == "one":
+        if self.repeat_mode == "one" and response_from_button:
             return self._queue.current.track
         if not self._queue.current.next and self.repeat_mode == "all":
             self._queue.current = self._queue.head
             return self._queue.current.track if self._queue.current else None
-        self._queue.current = self._queue.current.next
+        self._queue.current = (
+            self._queue.current.next
+            if self._queue.current.next
+            else self._queue.current
+        )
         return self._queue.current.track
 
     async def prev_track(self) -> entities.Track | None:
         if not self._queue.current or not self._queue.current.prev:
             return None
-        self._queue.current = self._queue.current.prev
+        if not self._queue.current.prev and self.repeat_mode == "all":
+            self._queue.current = self._queue.tail
+            return self._queue.current.track if self._queue.current else None
+        self._queue.current = (
+            self._queue.current.prev
+            if self._queue.current.prev
+            else self._queue.current
+        )
         return self._queue.current.track
 
     async def clear(self) -> None:

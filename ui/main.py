@@ -12,17 +12,23 @@ from textual.widgets import Button, Footer, Header, Label
 
 from ui.infrastructure.hotkeys import PynputHotkeyProvider
 from ui.utils.socket_client import SocketClient
+from ui.viewmodels.albums import AlbumListViewModel
 from ui.viewmodels.auth import AuthViewModel
+from ui.viewmodels.catalog import AlbumDetailViewModel
 from ui.viewmodels.player import PlayerViewModel
+from ui.viewmodels.playlists import PlaylistViewModel
 from ui.viewmodels.queue import QueueViewModel
 from ui.viewmodels.search import SearchViewModel
+from ui.views.albums_view import UserAlbumsView
 from ui.views.auth_screen import AuthScreen
 from ui.views.log_view import LogPanel
+from ui.views.playlist_view import PlaylistView
 from ui.views.search_view import SearchView
 from ui.widgets.player_bar import PlayerBar, TickerLabel
 from ui.widgets.queue_drawer import QueueDrawer
 from ui.widgets.sidebar import Sidebar
 from ui.widgets.slider import InteractiveSlider
+from textual.widgets import Button, Footer, Header, Label, ContentSwitcher
 
 
 class MusicPlayerApp(App[None]):
@@ -59,6 +65,9 @@ class MusicPlayerApp(App[None]):
         self.player_vm: Final[PlayerViewModel] = PlayerViewModel(self.client)
         self.auth_vm: Final[AuthViewModel] = AuthViewModel(self.client)
         self.queue_vm: Final[QueueViewModel] = QueueViewModel(self.client)
+        self.playlist_vm: Final[PlaylistViewModel] = PlaylistViewModel(self.client)
+        self.album_list_vm: Final[AlbumListViewModel] = AlbumListViewModel(self.client)
+        self.album_detail_vm: Final[AlbumDetailViewModel] = AlbumDetailViewModel(self.client)
 
         self.player_vm.subscribe(self._on_player_update)
         self._hotkey_provider: Final[PynputHotkeyProvider] = PynputHotkeyProvider()
@@ -68,7 +77,14 @@ class MusicPlayerApp(App[None]):
         yield Sidebar(id="sidebar")
         with Horizontal(id="main_content"):
             with Container(id="main_container"):
-                yield SearchView(viewmodel=self.search_vm, id="search_view")
+                with ContentSwitcher(initial="search_view", id="main_switcher"):
+                    yield SearchView(viewmodel=self.search_vm, id="search_view")
+                    yield PlaylistView(viewmodel=self.playlist_vm, id="playlist_view")
+                    yield UserAlbumsView(
+                        list_vm=self.album_list_vm, 
+                        detail_vm=self.album_detail_vm, 
+                        id="albums_view"
+                    )
             yield QueueDrawer(
                 viewmodel=self.queue_vm, id="queue_drawer", classes="-hidden"
             )
@@ -91,10 +107,12 @@ class MusicPlayerApp(App[None]):
         self.run_worker(self.player_vm.toggle_pause())
 
     def action_next_track(self) -> None:
-        self.run_worker(self.player_vm.next_track())
+        self.run_worker(self.player_vm.next_track(from_button=True))
+        self.run_worker(self.queue_vm.load_queue())
 
     def action_prev_track(self) -> None:
-        self.run_worker(self.player_vm.prev_track())
+        self.run_worker(self.player_vm.prev_track(from_button=True))
+        self.run_worker(self.queue_vm.load_queue())
 
     def action_toggle_logs(self) -> None:
         self.query_one(LogPanel).toggle_class("-visible")
@@ -173,9 +191,20 @@ class MusicPlayerApp(App[None]):
         except Exception as e:
             logger.error(f"Ошибка при обновлении UI плеера: {e}")
 
+    def _update_sidebar_active(self, active_id: str) -> None:
+        for btn in self.query("#sidebar Button"):
+            if btn.id == active_id:
+                btn.add_class("-active")
+            else:
+                btn.remove_class("-active")
+
     @on(Button.Pressed, "#btn_repeat")
     def handle_repeat(self) -> None:
-        self.run_worker(self.player_vm.toggle_repeat())
+        async def _do_toggle():
+            await self.player_vm.toggle_repeat()
+            self._on_player_update()
+
+        self.run_worker(_do_toggle())
 
     @on(Button.Pressed, "#btn_play_pause")
     def handle_play_pause(self) -> None:
@@ -195,7 +224,8 @@ class MusicPlayerApp(App[None]):
 
     @on(Button.Pressed, "#btn_search")
     def handle_sidebar_search(self) -> None:
-        self.notify("Поиск уже активен", severity="information")
+        self.query_one("#main_switcher", ContentSwitcher).current = "search_view"
+        self._update_sidebar_active("btn_search")
 
     @on(Button.Pressed, "#btn_wave")
     def handle_my_wave(self) -> None:
@@ -203,11 +233,14 @@ class MusicPlayerApp(App[None]):
 
     @on(Button.Pressed, "#btn_playlists")
     def handle_playlists(self) -> None:
-        self.notify("Плейлисты: Функция в разработке", severity="information")
+        self.query_one("#main_switcher", ContentSwitcher).current = "playlist_view"
+        self._update_sidebar_active("btn_playlists")
 
     @on(Button.Pressed, "#btn_albums")
     def handle_albums(self) -> None:
-        self.notify("Альбомы: Функция в разработке", severity="information")
+        self.query_one("#main_switcher", ContentSwitcher).current = "albums_view"
+        self._update_sidebar_active("btn_albums")
+
 
 
 if __name__ == "__main__":

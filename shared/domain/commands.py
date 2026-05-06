@@ -42,10 +42,12 @@ class SetVolumeCommand(PlaybackCommand):
 
 class NextTrackCommand(PlaybackCommand):
     action: Literal["playback.next"] = "playback.next"
+    response_from_button: bool
 
 
 class PrevTrackCommand(PlaybackCommand):
     action: Literal["playback.prev"] = "playback.prev"
+    response_from_button: bool
 
 
 class GetQueueCommand(PlaybackCommand):
@@ -76,6 +78,15 @@ class GetArtistCatalogCommand(CatalogCommand):
     artist_id: str
 
 
+class GetUserPlaylistsCommand(CatalogCommand):
+    action: Literal["catalog.get_user_playlists"] = "catalog.get_user_playlists"
+
+
+class GetPlaylistTracksCommand(CatalogCommand):
+    action: Literal["catalog.get_playlist"] = "catalog.get_playlist"
+    playlist_id: str
+
+
 class PlayMyWaveCommand(BaseCommand):
     action: Literal["my_wave"] = "my_wave"
     mood: str | None = None
@@ -99,6 +110,7 @@ class PlayMediaCommand(PlaybackCommand):
     action: Literal["playback.play_media"] = "playback.play_media"
     media_id: str | int
     media_type: Literal["track", "album", "playlist", "artist"]
+    start_from_track_id: str | int | None = None
 
 
 AnyCommand = Annotated[
@@ -114,6 +126,8 @@ AnyCommand = Annotated[
     | GetAuthCodeCommand
     | GetAuthStatusCommand
     | GetAlbumCatalogCommand
-    | GetArtistCatalogCommand,
+    | GetArtistCatalogCommand
+    | GetUserPlaylistsCommand
+    | GetPlaylistTracksCommand,
     Field(discriminator="action"),
 ]

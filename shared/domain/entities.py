@@ -57,7 +57,7 @@ class Playlist(BaseEntity):
     title: str
     track_count: int
     cover_uri: str | None = None
-    tracks: list[Track] | None = None
+    tracks: list[Track] | None = Field(default_factory=list)
 
 
 class QueueNode(BaseEntity):

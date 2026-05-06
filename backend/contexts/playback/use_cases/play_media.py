@@ -36,7 +36,7 @@ class PlayMediaUseCase:
         elif cmd.media_type == "playlist":
             source = await self.provider.get_playlist_tracks(str(cmd.media_id))
         elif cmd.media_type == "artist":
-            source = await self.provider.get_artist_tracks(str(cmd.media_id))
+            source = await self.provider.get_artist_details(str(cmd.media_id))
 
         if not source:
             logger.error(
@@ -45,6 +45,13 @@ class PlayMediaUseCase:
             return
 
         queue = await QueueFactory.create_queue(source)
+        if cmd.start_from_track_id:
+            current_node = queue.head
+            while current_node:
+                if str(current_node.track.id) == str(cmd.start_from_track_id):
+                    queue.current = current_node
+                    break
+                current_node = current_node.next
         await self.queue_manager.set_queue(queue)
         current_track = await self.queue_manager.get_current()
         if current_track:

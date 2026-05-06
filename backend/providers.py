@@ -11,6 +11,7 @@ from backend.contexts.playback.use_cases.get_queue import GetQueueUseCase
 from backend.contexts.playback.use_cases.move_track import MoveTrackUseCase
 from backend.contexts.playback.use_cases.play_media import PlayMediaUseCase
 from backend.infrastructure.config.service import ConfigService
+from backend.infrastructure.db.provider import DatabaseProvider  # noqa
 from backend.infrastructure.players.mpv import MpvAudioPlayer
 from backend.infrastructure.yandex.searcher import YandexSearcher
 from backend.infrastructure.yandex.streamer import YandexStreamer

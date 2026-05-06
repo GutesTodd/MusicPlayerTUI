@@ -9,13 +9,16 @@ class QueueFactory:
         source: entities.Track
         | entities.Album
         | entities.Playlist
+        | entities.Artist
         | list[entities.Track],
     ) -> entities.TrackQueue:
         tracks = []
         if isinstance(source, entities.Track):
             tracks = [source]
         elif isinstance(source, (entities.Album, entities.Playlist)):
-            tracks = source.tracks
+            tracks = source.tracks or []
+        elif isinstance(source, entities.Artist):
+            tracks = source.details.popular_tracks if source.details else []
         elif isinstance(source, list):
             tracks = source
         if not tracks:
